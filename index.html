@@ -12,7 +12,7 @@
     .header-bar h1 { margin: 0; font-size: 24px; color: var(--primary); }
     .btn-admin-login { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     
-    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
     
     .sidebar { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 300px; height: fit-content; }
     .admin-controls-active { display: block !important; }
@@ -25,6 +25,7 @@
     ul.player-list { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; }
     ul.player-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;}
 
+    /* El contenedor SVG siempre visible */
     .svg-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; flex: 1; min-width: 320px; display: flex; justify-content: center; overflow: hidden; }
     svg { max-width: 100%; height: auto; }
     .node-link { fill: none; stroke: #cbd5e1; stroke-width: 1.5; }
@@ -61,7 +62,7 @@
 
   <script>
     // =================================================================
-    // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+    // TU URL DE APLICACIÓN WEB
     // =================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxcPyvf3VM8-buq3X59B0bQphioZOoh-jMkKGkT1b785qud7EQ7NY9f9dvZAbAXUyk/exec"; 
     
@@ -72,12 +73,18 @@
 
     async function cargarDatosIniciales() {
       try {
-        let respuesta = await fetch(API_URL);
+        // En peticiones a Google Apps Script, redirect: 'follow' es clave
+        let respuesta = await fetch(API_URL, { redirect: 'follow' });
+        
+        if (!respuesta.ok) {
+          throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+
         DATA = await respuesta.json();
         construirInterfaz();
         renderizarDatos();
       } catch (error) {
-        document.getElementById('loader').innerText = "⚠️ Error al conectar con Google Sheets.";
+        document.getElementById('loader').innerText = "⚠️ Error al conectar con Google Sheets. Por favor, recarga la página o verifica los permisos en Apps Script.";
         console.error(error);
       }
     }
@@ -87,7 +94,8 @@
         document.body.style.cursor = 'wait';
         let respuesta = await fetch(API_URL, {
           method: 'POST',
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          redirect: 'follow' // Necesario para POST en Google Script
         });
         let nuevaData = await respuesta.json();
         document.body.style.cursor = 'default';
@@ -115,6 +123,7 @@
       }
     }
 
+    // Se eliminó el "if" que ocultaba el SVG si no era admin, para que sea siempre visible
     function construirInterfaz() {
       const container = document.getElementById('mainContainer');
       container.innerHTML = `
@@ -128,6 +137,7 @@
           <h4>Participantes (<span id="numJugadores">0</span>)</h4>
           <ul id="listaJugadores" class="player-list"></ul>
         </div>
+        
         <div class="svg-container" id="svgContainer">
           <svg id="bracketSvg" viewBox="0 0 800 800" width="800" height="800"></svg>
           <div class="winner-box" id="winnerBox">
@@ -135,6 +145,7 @@
             <small id="winOwner">Esperando campeón</small>
           </div>
         </div>
+
         <div class="mapping-section">
           <h3>📋 Reparto de Países</h3>
           <div id="gridMapping" class="grid-mapping"></div>
@@ -166,6 +177,7 @@
     }
 
     function renderizarDatos() {
+      // 1. Sidebar
       document.getElementById('numJugadores').innerText = DATA.jugadores.length;
       document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `<li><span>👤 ${j.nombre}</span> <small>${j.equipos.length} eq.</small></li>`).join('');
       
@@ -176,18 +188,19 @@
         document.getElementById('txtNombre').disabled = true;
       }
 
+      // 2. Dibujar Gráfico Radial Siempre
       dibujarBracket();
 
+      // 3. Grid Inferior visible desde el principio
       let grid = document.getElementById('gridMapping');
-      if(DATA.estado === 'Cerrada') {
-        grid.innerHTML = DATA.equiposIniciales.map(e => {
-          let dueno = DATA.jugadores.find(j => j.equipos.includes(e));
-          if (e === "Eliminado") return '';
-          return `<div class="card-map"><span>${e}</span> <b>${dueno ? dueno.nombre : '-'}</b></div>`;
-        }).join('');
-      } else {
-        grid.innerHTML = "<p>El sorteo automático aparecerá aquí al cerrar la quiniela.</p>";
-      }
+      // Ahora dibujamos la lista siempre, sin importar si está abierta o cerrada
+      grid.innerHTML = DATA.equiposIniciales.map(e => {
+        let dueno = DATA.jugadores.find(j => j.equipos.includes(e));
+        if (e === "Eliminado") return ''; // Oculta los espacios nulos
+        // Si no hay dueño asignado aún, muestra 'Sin asignar'
+        let nombreMostrado = dueno ? dueno.nombre : "<span style='color:#94a3b8;'>Sin asignar</span>";
+        return `<div class="card-map"><span>${e}</span> <b>${nombreMostrado}</b></div>`;
+      }).join('');
     }
 
     function dibujarBracket() {
