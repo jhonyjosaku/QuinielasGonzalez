@@ -189,8 +189,7 @@
           <button class="btn-danger" id="btnCerrar" onclick="cerrarQuiniela()">🔒 Cerrar y Sortear</button>
           
           <!-- BOTÓN MAESTRO DE SINCRONIZACIÓN -->
-          <button style="background: #10b981; width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;" onclick="sincronizarAPI()">🔄 Obtener Resultados Reales</button>
-          
+          <button id="btnSync" style="background: #10b981; width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;" onclick="sincronizarAPI()">🔄 Obtener Resultados Reales</button>
           <hr style="border:0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
           <h4 style="margin: 0 0 10px 0;">Participantes (<span id="numJugadores">0</span>)</h4>
           <ul id="listaJugadores" class="player-list"></ul>
@@ -238,9 +237,27 @@
     }
 
     async function sincronizarAPI() {
-      if(confirm("¿Sincronizar resultados con la base de datos de la FIFA? Esto avanzará a los ganadores (como Brasil).")) {
+      if(confirm("¿Sincronizar resultados oficiales con la base de datos de la FIFA?")) {
+        
+        let btn = document.getElementById('btnSync');
+        btn.innerText = "Consultando servidores... ⏳"; // Esto te avisará que Vercel sí reaccionó al clic
+        btn.disabled = true;
+
         let res = await enviarAccion({ accion: 'sincronizarAPI' });
-        if(res) { DATA = res; renderizarDatos(); alert("¡Marcadores oficiales procesados con éxito!"); }
+
+        if(res) {
+          if(res.datos) {
+            DATA = res.datos;
+            // ESTA ALERTA ES LA CLAVE: Nos dirá exactamente qué ve Google.
+            alert("Reporte del sistema:\n\n" + res.debug); 
+          } else {
+            DATA = res;
+          }
+          renderizarDatos(); 
+        }
+
+        btn.innerText = "🔄 Obtener Resultados Reales";
+        btn.disabled = false;
       }
     }
 
