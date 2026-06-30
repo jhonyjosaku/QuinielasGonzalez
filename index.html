@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiniela Mundial 2026</title>
   <style>
-    /* TEMA CLARO Y RESPONSIVO CON NEÓN */
+    /* TEMA CLARO Y RESPONSIVO CON NEÓN FLUIDO */
     :root { 
       --bg-color: #f7f5f0; 
       --primary: #1e293b; 
-      --accent: #06b6d4; /* Azul Turquesa Eléctrico */
+      --accent: #06b6d4; /* Azul Turquesa Eléctrico/Agua */
       --border: #cbd5e1;
       --text-main: #334155; 
     }
@@ -37,7 +37,6 @@
     .btn-admin-logout { display: none; background: #ef4444; border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; max-width: 200px;}
     .btn-admin-logout:hover { background: #dc2626; }
     
-    /* CORRECCIÓN DE LAYOUT PARA PANTALLA COMPLETA */
     .container { max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     
     .top-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; }
@@ -49,7 +48,6 @@
     @media (min-width: 1024px) { .sidebar { max-width: 320px; } }
     .admin-controls-active { display: block !important; }
     
-    /* CONTENEDOR SVG BLINDADO CONTRA APLASTAMIENTO */
     .bracket-panel { flex: 1 1 auto; min-height: 600px; display: flex; flex-direction: column; overflow: hidden; }
     .svg-wrapper { width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
     svg { width: 100%; height: 100%; max-height: 85vh; display: block; margin: 0 auto; transition: all 0.5s ease-in-out; }
@@ -64,23 +62,25 @@
     ul.player-list li small { color: #64748b; font-weight: bold; }
 
     /* ========================================= */
-    /* ANIMACIONES DE ENERGÍA Y RELÁMPAGOS       */
+    /* ANIMACIONES FLUIDAS TIPO AGUA/ENERGÍA     */
     /* ========================================= */
     
-    .node-link { fill: none; stroke: #e2e8f0; stroke-width: 2; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    /* Conector inactivo (canal vacío) */
+    .node-link { fill: none; stroke: #e2e8f0; stroke-width: 2.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     
-    /* 1. La Energía fluyendo (Relámpago en movimiento) */
+    /* Conector activo (Agua fluyendo) */
     .node-link.active { 
       stroke: var(--accent); 
-      stroke-width: 4; 
-      stroke-dasharray: 12 12; /* Segmentos eléctricos */
-      animation: electricFlow 0.5s linear infinite; /* Movimiento del flujo */
-      filter: drop-shadow(0px 0px 5px rgba(6, 182, 212, 0.7));
+      stroke-width: 4.5; 
+      stroke-linecap: round; /* Bordes suaves de líquido */
+      stroke-dasharray: 20 8; /* Trazos largos, vacíos cortos (más orgánico) */
+      animation: fluidFlow 0.4s linear infinite; /* Rápido y continuo */
+      filter: drop-shadow(0px 0px 6px rgba(6, 182, 212, 0.8));
     }
     
-    @keyframes electricFlow {
-      from { stroke-dashoffset: 24; }
-      to { stroke-dashoffset: 0; } /* Se mueve hacia el centro */
+    @keyframes fluidFlow {
+      from { stroke-dashoffset: 28; } /* 20 + 8 */
+      to { stroke-dashoffset: 0; } 
     }
     
     .node-group { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -88,7 +88,7 @@
     .node-circle { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; transition: transform 0.2s, stroke 0.3s; }
     .node-circle.active { stroke: var(--accent); fill: #ecfeff; stroke-width: 2.5; }
     
-    /* 2. El Impacto (Nodo Frontera cargado de energía) */
+    /* El Impacto (Nodo Frontera) */
     .frontier-spark {
       stroke: #ffffff !important;
       stroke-width: 4 !important;
@@ -101,7 +101,6 @@
       100% { filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 10px #ffffff); transform: scale(1.4); }
     }
 
-    /* 3. Brillo Maestro del Campeón */
     .glowing-champion { animation: lightningGlow 2.5s infinite ease-in-out; }
     @keyframes lightningGlow {
       0% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); transform: scale(1); }
@@ -136,7 +135,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxcPyvf3VM8-buq3X59B0bQphioZOoh-jMkKGkT1b785qud7EQ7NY9f9dvZAbAXUyk/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyizNP6mZogEqYC_2TiZSz7BT30G5QTNZw3dD-siePBX3chUzAfHyZEFNItniT4ktg4/exec"; 
     
     let ES_ADMIN = false;
     let DATA = null;
@@ -214,7 +213,6 @@
 
     function construirInterfaz() {
       const container = document.getElementById('mainContainer');
-      // AQUI ES DONDE SE BLINDA EL LAYOUT PARA QUE LA PC NO APLASTE EL GRAFICO
       container.innerHTML = `
         <div class="top-layout">
           <div class="sidebar panel" id="sidebarAdmin">
@@ -345,7 +343,7 @@
         }
       });
 
-      // 1. DIBUJAMOS LOS CONECTORES CON ENERGÍA TURQUESA
+      // 1. DIBUJAMOS LOS CONECTORES CON LA NUEVA LÓGICA DE RUTAS
       for (let r = 0; r < rondas.length - 1; r++) {
         let rAct = rondas[r], rSig = rondas[r+1];
         for (let i = 0; i < slots[rAct]; i++) {
@@ -370,7 +368,11 @@
             pathLayer.appendChild(path);
           }
           
-          if(DATA.bracket[rAct + '_' + i] && DATA.bracket[rAct + '_' + i] !== "Eliminado") {
+          let equipoOrigen = DATA.bracket[rAct + '_' + i];
+          let equipoDestino = DATA.bracket[rSig + '_' + Math.floor(i/2)];
+
+          // EL CAMBIO MAESTRO: La luz solo existe si el equipoOrigen realmente llegó al equipoDestino
+          if(equipoOrigen && equipoOrigen !== "Eliminado" && equipoOrigen === equipoDestino) {
             path.classList.add('active');
           } else {
             path.classList.remove('active');
@@ -380,21 +382,20 @@
         }
       }
 
-      // 2. DIBUJAMOS LOS NODOS Y DETECTAMOS EL IMPACTO
+      // 2. NODOS Y FRONTERA
       rondas.forEach(r => {
         let radioCirculo = 16; 
         for(let i=0; i<slots[r]; i++) {
           let pos = coords[r + '_' + i];
           let equipo = DATA.bracket[r + '_' + i] || "";
 
-          // Detección de "La Frontera" (El equipo más avanzado)
           let isFrontier = false;
           if (equipo && equipo !== "Eliminado") {
             let proxR = { R1:'R2', R2:'R3', R3:'R4', R4:'R5', R5:'Campeon' }[r];
             let proxSlot = (proxR === 'Campeon') ? 0 : Math.floor(i/2);
             let equipoSiguiente = DATA.bracket[proxR + '_' + proxSlot];
             if (equipoSiguiente !== equipo) {
-              isFrontier = true; // Aquí choca el relámpago
+              isFrontier = true; 
             }
           }
 
@@ -416,11 +417,11 @@
           g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
 
           let c = g.querySelector('.node-circle');
-          c.className.baseVal = "node-circle"; // Reiniciamos clases
+          c.className.baseVal = "node-circle"; 
           
           if(equipo && equipo !== "Eliminado") {
             c.classList.add("active");
-            if (isFrontier) c.classList.add("frontier-spark"); // Aplica el impacto
+            if (isFrontier) c.classList.add("frontier-spark"); 
           }
 
           let oldImg = g.querySelector('image'); let oldText = g.querySelector('text');
@@ -460,7 +461,7 @@
         }
       });
 
-      // 3. EL CAMPEÓN ILUMINADO
+      // 3. EL CAMPEÓN
       let camp = DATA.bracket['Campeon_0'];
       let campX = CX;
       let campY = isMobile ? coords['R5_0'].y : CY; 
@@ -474,7 +475,6 @@
          let d = DATA.jugadores.find(j => j.equipos.includes(camp));
          let dueno = d ? d.nombre : "S/A";
 
-         // Activamos la clase maestro de brillo
          champGroup.setAttribute("class", "node-group glowing-champion");
 
          let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
