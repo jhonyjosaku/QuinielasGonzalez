@@ -9,7 +9,7 @@
     :root { 
       --bg-color: #f7f5f0; 
       --primary: #1e293b; 
-      --accent: #d4af37; 
+      --accent: #06b6d4; /* AZUL TURQUESA NEÓN PARA EL RELÁMPAGO */
       --border: #cbd5e1;
       --text-main: #334155; 
     }
@@ -55,27 +55,44 @@
     ul.player-list li { padding: 10px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 14px;}
     ul.player-list li small { color: #64748b; font-weight: bold; }
 
-    /* CONTENEDOR SVG ADAPTABLE */
-    .svg-wrapper { width: 100%; display: flex; justify-content: center; padding: 10px 0;}
+    /* CONTENEDOR SVG ADAPTABLE CORREGIDO PARA PANTALLA COMPLETA */
+    .svg-wrapper { width: 100%; display: flex; justify-content: center; padding: 10px 0; background: white; border-radius: 12px;}
     .svg-container { flex: 1; padding: 0; display: flex; justify-content: center; position: relative; width: 100%; }
     
-    /* El SVG transiciona suavemente al cambiar de tamaño */
-    svg { width: 100%; height: auto; max-width: 1000px; max-height: 85vh; transition: all 0.8s ease-in-out; }
+    svg { width: 100%; height: auto; max-width: 1000px; display: block; margin: 0 auto; transition: all 0.5s ease-in-out; }
     
-    /* ANIMACIONES TIPO ORIGAMI CSS */
-    .node-link { fill: none; stroke: #cbd5e1; stroke-width: 1.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .node-link.active { stroke: var(--accent); stroke-width: 3; }
+    /* EFECTO RELÁMPAGO EN LOS CONECTORES ACENTUADOS */
+    .node-link { fill: none; stroke: #e2e8f0; stroke-width: 2; stroke-linecap: round; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s, stroke-width 0.4s; }
+    
+    /* El relámpago turquesa con aura de neón */
+    .node-link.active { 
+      stroke: var(--accent); 
+      stroke-width: 3.5; 
+      filter: drop-shadow(0px 0px 4px rgba(6, 182, 212, 0.6));
+    }
     
     .node-group { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     
-    .node-circle { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; cursor: default; transition: transform 0.2s, stroke 0.2s; }
-    .node-circle.active { stroke: var(--accent); stroke-width: 3; }
+    .node-circle { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; cursor: default; transition: transform 0.2s, stroke 0.3s, fill 0.3s; }
+    .node-circle.active { stroke: var(--accent); fill: #ecfeff; stroke-width: 2.5; filter: drop-shadow(0px 0px 3px rgba(6, 182, 212, 0.4));}
     
     .admin-mode .node-group { cursor: pointer; }
-    .admin-mode .node-group:hover .node-circle { transform: scale(1.15); stroke: var(--primary); }
+    .admin-mode .node-group:hover .node-circle { transform: scale(1.2); stroke: var(--primary); }
     
-    .node-text { font-size: 11px; font-weight: bold; pointer-events: none; font-family: sans-serif; }
+    .node-text { font-size: 11px; font-weight: 700; pointer-events: none; font-family: sans-serif; letter-spacing: -0.3px; }
     
+    /* ANIMACIÓN DE BRILLO PARA EL CAMPEÓN CENTRAL */
+    @keyframes lightningGlow {
+      0% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 25px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 10px rgba(214, 175, 55, 0.4)); transform: scale(1.03); }
+      100% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); transform: scale(1); }
+    }
+    
+    .glowing-champion {
+      animation: lightningGlow 2.5s infinite ease-in-out;
+      cursor: pointer;
+    }
+
     .mapping-section { width: 100%; margin-top: 10px; }
     .grid-mapping { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 15px; }
     .card-map { padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
@@ -100,9 +117,9 @@
 
   <script>
     // =================================================================
-    // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+    // ENLACE DIRECTO A TU BASE DE DATOS EN GOOGLE APPS SCRIPT
     // =================================================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbyizNP6mZogEqYC_2TiZSz7BT30G5QTNZw3dD-siePBX3chUzAfHyZEFNItniT4ktg4/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxcPyvf3VM8-buq3X59B0bQphioZOoh-jMkKGkT1b785qud7EQ7NY9f9dvZAbAXUyk/exec"; 
     
     let ES_ADMIN = false;
     let DATA = null;
@@ -120,16 +137,13 @@
 
     window.onload = () => {
       cargarDatosIniciales();
-      // El motor que detecta si giras el celular o encoges la ventana en la PC
-      window.addEventListener('resize', () => {
-        if(DATA) dibujarBracket();
-      });
+      window.addEventListener('resize', () => { if(DATA) dibujarBracket(); });
     };
 
     async function cargarDatosIniciales() {
       try {
         let respuesta = await fetch(API_URL, { redirect: 'follow' });
-        if (!respuesta.ok) throw new Error(`Error HTTP`);
+        if (!respuesta.ok) throw new Error();
         DATA = await respuesta.json();
         construirInterfaz();
         renderizarDatos();
@@ -153,7 +167,7 @@
         return nuevaData;
       } catch (error) {
         document.body.style.cursor = 'default';
-        alert("Error: Revisa tu conexión a internet.");
+        alert("Error al procesar la jugada.");
         return null;
       }
     }
@@ -183,7 +197,6 @@
 
     function construirInterfaz() {
       const container = document.getElementById('mainContainer');
-      // Eliminamos el <div id="winnerBox"> de HTML para integrarlo puro en SVG
       container.innerHTML = `
         <div class="sidebar panel" id="sidebarAdmin">
           <h3 style="margin-top:0; text-align:center;">🛠 Panel de Control</h3>
@@ -227,7 +240,7 @@
     }
 
     async function cerrarQuiniela() {
-      if(confirm("¿Seguro? Esto repartirá los equipos a los jugadores actuales.")) {
+      if(confirm("¿Seguro? Esto repartirá los equipos.")) {
         document.getElementById('btnCerrar').disabled = true;
         let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
         if(res) { DATA = res; renderizarDatos(); }
@@ -259,19 +272,15 @@
       }).join('');
     }
 
-    // =========================================================
-    // MOTOR GRÁFICO TIPO ORIGAMI (PC vs MOBILE)
-    // =========================================================
+    // =========================================================================
+    // MOTOR GRÁFICO REAJUSTADO (PANTALLA COMPLETA PC FIJA + EFECTO RELÁMPAGO)
+    // =========================================================================
     function dibujarBracket() {
       const svg = document.getElementById('bracketSvg');
-      
-      // Detectamos el dispositivo dinámicamente
       const isMobile = window.innerWidth <= 850;
       
-      // El lienzo crece hacia abajo si es celular (1200) para que no se apriete
       svg.setAttribute("viewBox", isMobile ? "0 0 1000 1200" : "0 0 1000 1000");
 
-      // Si es la primera vez, construimos las capas
       if (!document.getElementById('pathLayer')) {
         svg.innerHTML = `
           <defs>
@@ -281,7 +290,7 @@
           </defs>
           <g id="pathLayer"></g>
           <g id="nodeLayer"></g>
-          <g id="championGroup" class="node-group"></g>
+          <g id="championGroup"></g>
         `;
       }
 
@@ -289,34 +298,30 @@
       let nodeLayer = document.getElementById('nodeLayer');
       let champGroup = document.getElementById('championGroup');
       
+      // EL CAMBIO DE PANTALLA COMPLETA: Coordenadas fijas en el centro absoluto del lienzo (500, 500)
       const CX = 500, CY = 500;
-      const radios = { R1: 430, R2: 340, R3: 250, R4: 160, R5: 80 };
+      const radios = { R1: 440, R2: 355, R3: 270, R4: 185, R5: 95 };
       const slots = { R1: 32, R2: 16, R3: 8, R4: 4, R5: 2 };
       const rondas = Object.keys(slots);
 
-      // 1. DICCIONARIO DE COORDENADAS (El cerebro del origami)
       let coords = {};
 
       rondas.forEach(r => {
         for(let i=0; i<slots[r]; i++) {
           let x, y;
           if (!isMobile) {
-            // MATEMÁTICAS DE PC: CÍRCULO PERFECTO
             let ang = (i * 2 * Math.PI) / slots[r] - Math.PI/2;
             x = CX + radios[r] * Math.cos(ang);
             y = CY + radios[r] * Math.sin(ang);
           } else {
-            // MATEMÁTICAS DE MÓVIL: ÁRBOL VERTICAL TIPO LLAVE
             let isLeft = i < (slots[r] / 2);
             if (r === 'R1') {
-              x = isLeft ? 60 : 940; // Bien pegados a los bordes
+              x = isLeft ? 60 : 940; 
               y = 50 + (isLeft ? i : i - 16) * 73; 
             } else {
               let prevR = rondas[rondas.indexOf(r) - 1];
               let child1 = coords[prevR + '_' + (i*2)];
               let child2 = coords[prevR + '_' + (i*2+1)];
-              
-              // Ajustamos la separación para dejar un "valle" enorme en el centro
               let offset = { 'R2': 170, 'R3': 270, 'R4': 360, 'R5': 440 }[r]; 
               x = isLeft ? offset : 1000 - offset;
               y = (child1.y + child2.y) / 2; 
@@ -326,20 +331,19 @@
         }
       });
 
-      // 2. ACTUALIZAMOS LAS LÍNEAS
+      // 2. CONECTORES (RELÁMPAGO TURQUESA DINÁMICO)
       for (let r = 0; r < rondas.length - 1; r++) {
         let rAct = rondas[r], rSig = rondas[r+1];
         for (let i = 0; i < slots[rAct]; i++) {
           let p1 = coords[rAct + '_' + i];
           let p2 = coords[rSig + '_' + Math.floor(i/2)];
-          
           let pM;
+          
           if (!isMobile) {
             let rMedio = (radios[rAct] + radios[rSig]) / 2;
             let ang1 = (i * 2 * Math.PI) / slots[rAct] - Math.PI/2;
             pM = { x: CX + rMedio * Math.cos(ang1), y: CY + rMedio * Math.sin(ang1) };
           } else {
-            // Codo recto cuadrado de torneo clásico
             pM = { x: p2.x, y: p1.y };
           }
 
@@ -352,14 +356,18 @@
             pathLayer.appendChild(path);
           }
           
-          if(DATA.bracket[rAct + '_' + i]) path.classList.add('active');
-          else path.classList.remove('active');
+          // Si el nodo tiene un país, el relámpago turquesa se enciende en esa línea
+          if(DATA.bracket[rAct + '_' + i] && DATA.bracket[rAct + '_' + i] !== "Eliminado") {
+            path.classList.add('active');
+          } else {
+            path.classList.remove('active');
+          }
 
           path.setAttribute("d", `M ${p1.x} ${p1.y} L ${pM.x} ${pM.y} L ${p2.x} ${p2.y}`);
         }
       }
 
-      // 3. ACTUALIZAMOS LOS NODOS (Círculos y banderas)
+      // 3. NODOS
       rondas.forEach(r => {
         let radioCirculo = 16; 
         for(let i=0; i<slots[r]; i++) {
@@ -369,7 +377,6 @@
           let groupId = `node_${r}_${i}`;
           let g = document.getElementById(groupId);
 
-          // Si la pieza no existe, la creamos vacía
           if (!g) {
             g = document.createElementNS("http://www.w3.org/2000/svg", "g");
             g.id = groupId;
@@ -382,11 +389,10 @@
             nodeLayer.appendChild(g);
           }
 
-          // Doblado CSS Origami
           g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
 
           let c = g.querySelector('.node-circle');
-          if(equipo) c.classList.add("active"); else c.classList.remove("active");
+          if(equipo && equipo !== "Eliminado") c.classList.add("active"); else c.classList.remove("active");
 
           let oldImg = g.querySelector('image'); let oldText = g.querySelector('text');
           if (oldImg) oldImg.remove(); if (oldText) oldText.remove();
@@ -415,25 +421,23 @@
             }
 
             let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            tNombre.setAttribute("x", 0); tNombre.setAttribute("y", radioCirculo + (isMobile ? 12 : 14)); 
+            tNombre.setAttribute("x", 0); tNombre.setAttribute("y", radioCirculo + 13); 
             tNombre.setAttribute("text-anchor", "middle");
             tNombre.setAttribute("class", "node-text");
-            tNombre.setAttribute("fill", "#1e293b");
+            tNombre.setAttribute("fill", varName => "--primary");
             tNombre.textContent = nombreLimpio;
             g.appendChild(tNombre);
           }
         }
       });
 
-      // 4. EL CAMPEÓN (TOTALMENTE INTEGRADO EN EL DIBUJO SVG)
+      // 4. EL CAMPEÓN INTERACTIVO CON PULSO DE ENERGÍA NEÓN
       let camp = DATA.bracket['Campeon_0'];
-      
-      // Coordenadas perfectas
-      let campX = 500;
-      let campY = isMobile ? coords['R5_0'].y : 500; 
+      let campX = CX;
+      let campY = isMobile ? coords['R5_0'].y : CY; 
 
       champGroup.setAttribute("transform", `translate(${campX}, ${campY})`);
-      champGroup.innerHTML = ''; // Limpiamos el trofeo anterior
+      champGroup.innerHTML = ''; 
 
       if (camp) {
          let nombreLimpio = camp.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
@@ -441,45 +445,50 @@
          let d = DATA.jugadores.find(j => j.equipos.includes(camp));
          let dueno = d ? d.nombre : "S/A";
 
-         // Aureola dorada del campeón
+         // Activamos la clase de animación relámpago
+         champGroup.setAttribute("class", "node-group glowing-champion");
+
+         // Círculo base iluminado de turquesa
          let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-         circle.setAttribute("cx", 0); circle.setAttribute("cy", -15); circle.setAttribute("r", 35);
-         circle.setAttribute("fill", "#fef08a"); circle.setAttribute("stroke", "#d4af37"); circle.setAttribute("stroke-width", "3");
+         circle.setAttribute("cx", 0); circle.setAttribute("cy", -15); circle.setAttribute("r", 38);
+         circle.setAttribute("fill", "#ecfeff"); circle.setAttribute("stroke", "var(--accent)"); circle.setAttribute("stroke-width", "3.5");
          champGroup.appendChild(circle);
 
          if(flagCode) {
            let img = document.createElementNS("http://www.w3.org/2000/svg", "image");
            img.setAttribute("href", `https://flagcdn.com/w80/${flagCode}.png`);
-           img.setAttribute("x", -30); img.setAttribute("y", -45);
-           img.setAttribute("width", 60); img.setAttribute("height", 60);
+           img.setAttribute("x", -32); img.setAttribute("y", -47);
+           img.setAttribute("width", 64); img.setAttribute("height", 64);
            img.setAttribute("preserveAspectRatio", "xMidYMid slice");
            img.setAttribute("clip-path", "url(#circle-clip)");
            champGroup.appendChild(img);
          }
 
          let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tNombre.setAttribute("x", 0); tNombre.setAttribute("y", 35);
+         tNombre.setAttribute("x", 0); tNombre.setAttribute("y", 42);
          tNombre.setAttribute("text-anchor", "middle");
-         tNombre.setAttribute("font-size", "16"); tNombre.setAttribute("font-weight", "bold"); tNombre.setAttribute("fill", "#1e293b");
+         tNombre.setAttribute("font-size", "16"); tNombre.setAttribute("font-weight", "bold"); tNombre.setAttribute("fill", "var(--primary)");
          tNombre.textContent = nombreLimpio;
          champGroup.appendChild(tNombre);
 
          let tDueno = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tDueno.setAttribute("x", 0); tDueno.setAttribute("y", 52);
+         tDueno.setAttribute("x", 0); tDueno.setAttribute("y", 60);
          tDueno.setAttribute("text-anchor", "middle");
-         tDueno.setAttribute("font-size", "12"); tDueno.setAttribute("fill", "#0284c7"); tDueno.setAttribute("font-weight", "bold");
-         tDueno.textContent = "Premio para: " + dueno;
+         tDueno.setAttribute("font-size", "13"); tDueno.setAttribute("fill", "#0284c7"); tDueno.setAttribute("font-weight", "bold");
+         tDueno.textContent = "🥇 Ganador: " + dueno;
          champGroup.appendChild(tDueno);
       } else {
+         champGroup.setAttribute("class", "node-group");
+
          let tTrofeo = document.createElementNS("http://www.w3.org/2000/svg", "text");
          tTrofeo.setAttribute("x", 0); tTrofeo.setAttribute("y", -5);
          tTrofeo.setAttribute("text-anchor", "middle");
-         tTrofeo.setAttribute("font-size", "40");
+         tTrofeo.setAttribute("font-size", "42");
          tTrofeo.textContent = "🏆";
          champGroup.appendChild(tTrofeo);
 
          let tEspera = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tEspera.setAttribute("x", 0); tEspera.setAttribute("y", 25);
+         tEspera.setAttribute("x", 0); tEspera.setAttribute("y", 28);
          tEspera.setAttribute("text-anchor", "middle");
          tEspera.setAttribute("font-size", "14"); tEspera.setAttribute("fill", "#64748b"); tEspera.setAttribute("font-weight", "bold");
          tEspera.textContent = "Esperando Campeón";
