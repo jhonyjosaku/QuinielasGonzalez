@@ -218,14 +218,26 @@
       }
     }
 
-    async function cerrarQuiniela() {
+   async function cerrarQuiniela() {
       if(confirm("¿Estás seguro? Esto repartirá los equipos a los jugadores actuales.")) {
-        document.getElementById('btnCerrar').disabled = true;
+        let btn = document.getElementById('btnCerrar');
+        btn.disabled = true;
+        btn.innerText = "Sorteando... ⏳"; // Feedback visual
+        
         let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
-        if(res) { DATA = res; renderizarDatos(); }
+        
+        if(res) { 
+          DATA = res; 
+          renderizarDatos(); 
+        } else {
+          // Si hubo un error en la base de datos, destrabamos el botón
+          btn.disabled = false;
+          btn.innerText = "🔒 Cerrar y Sortear";
+          alert("El sorteo se detuvo. Revisa que no haya filas vacías en tu Google Sheet.");
+        }
       }
     }
-
+    
     function renderizarDatos() {
       document.getElementById('numJugadores').innerText = DATA.jugadores.length;
       document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `<li><span>👤 ${j.nombre}</span> <small>${j.equipos.length} eq.</small></li>`).join('');
