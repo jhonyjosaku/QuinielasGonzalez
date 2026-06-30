@@ -107,11 +107,9 @@
     // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
     // =================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxcPyvf3VM8-buq3X59B0bQphioZOoh-jMkKGkT1b785qud7EQ7NY9f9dvZAbAXUyk/exec"; 
-    
     let ES_ADMIN = false;
     let DATA = null;
 
-    // Diccionario de imágenes de banderas reales
     const FLAG_MAP = {
       "Brasil": "br", "Japón": "jp", "Irlanda": "ie", "Noruega": "no",
       "México": "mx", "Ecuador": "ec", "Inglaterra": "gb-eng", "RD Congo": "cd",
@@ -134,21 +132,26 @@
         construirInterfaz();
         renderizarDatos();
       } catch (error) {
-        document.getElementById('loader').innerText = "⚠️ Error al conectar con Google Sheets. Recarga la página.";
+        document.getElementById('loader').innerText = "⚠️ Error al conectar. Recarga la página.";
       }
     }
 
     async function enviarAccion(payload) {
       try {
         document.body.style.cursor = 'wait';
-        let respuesta = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), redirect: 'follow' });
+        let respuesta = await fetch(API_URL, { 
+          method: 'POST', 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // ESTO SOLUCIONA EL BLOQUEO MANUAL
+          body: JSON.stringify(payload), 
+          redirect: 'follow' 
+        });
         let nuevaData = await respuesta.json();
         document.body.style.cursor = 'default';
         if(nuevaData.error) throw new Error(nuevaData.error);
         return nuevaData;
       } catch (error) {
         document.body.style.cursor = 'default';
-        alert("Error: " + error.message);
+        alert("Error de conexión. Intenta de nuevo.");
         return null;
       }
     }
@@ -184,6 +187,10 @@
             <button onclick="anadirJugador()">Añadir</button>
           </div>
           <button class="btn-danger" id="btnCerrar" onclick="cerrarQuiniela()">🔒 Cerrar y Sortear</button>
+          
+          <!-- BOTÓN MAESTRO DE SINCRONIZACIÓN -->
+          <button style="background: #10b981; width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;" onclick="sincronizarAPI()">🔄 Obtener Resultados Reales</button>
+          
           <hr style="border:0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
           <h4 style="margin: 0 0 10px 0;">Participantes (<span id="numJugadores">0</span>)</h4>
           <ul id="listaJugadores" class="player-list"></ul>
@@ -214,35 +221,29 @@
 
     async function anadirJugador() {
       let txt = document.getElementById('txtNombre');
-      let nombre = txt.value.trim();
-      if(nombre) {
+      if(txt.value.trim()) {
         txt.disabled = true;
-        let res = await enviarAccion({ accion: 'agregarJugador', nombre: nombre });
+        let res = await enviarAccion({ accion: 'agregarJugador', nombre: txt.value.trim() });
         if(res) { DATA = res; txt.value = ''; renderizarDatos(); }
         txt.disabled = false;
       }
     }
 
-   async function cerrarQuiniela() {
-      if(confirm("¿Estás seguro? Esto repartirá los equipos a los jugadores actuales.")) {
-        let btn = document.getElementById('btnCerrar');
-        btn.disabled = true;
-        btn.innerText = "Sorteando... ⏳"; // Feedback visual
-        
+    async function cerrarQuiniela() {
+      if(confirm("¿Seguro? Esto repartirá los equipos a los jugadores.")) {
+        document.getElementById('btnCerrar').disabled = true;
         let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
-        
-        if(res) { 
-          DATA = res; 
-          renderizarDatos(); 
-        } else {
-          // Si hubo un error en la base de datos, destrabamos el botón
-          btn.disabled = false;
-          btn.innerText = "🔒 Cerrar y Sortear";
-          alert("El sorteo se detuvo. Revisa que no haya filas vacías en tu Google Sheet.");
-        }
+        if(res) { DATA = res; renderizarDatos(); }
       }
     }
-    
+
+    async function sincronizarAPI() {
+      if(confirm("¿Sincronizar resultados con la base de datos de la FIFA? Esto avanzará a los ganadores (como Brasil).")) {
+        let res = await enviarAccion({ accion: 'sincronizarAPI' });
+        if(res) { DATA = res; renderizarDatos(); alert("¡Marcadores oficiales procesados con éxito!"); }
+      }
+    }
+
     function renderizarDatos() {
       document.getElementById('numJugadores').innerText = DATA.jugadores.length;
       document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `<li><span>👤 ${j.nombre}</span> <small>${j.equipos.length} eq.</small></li>`).join('');
@@ -274,7 +275,6 @@
       const svg = document.getElementById('bracketSvg');
       svg.innerHTML = ''; 
       
-      // Creamos la máscara para recortar la bandera en un círculo perfecto
       let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
       let clip = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
       clip.setAttribute("id", "circle-clip");
@@ -311,7 +311,6 @@
 
       rondas.forEach(r => {
         let radioCirculo = 16; 
-
         for(let i=0; i<slots[r]; i++) {
           let ang = (i * 2 * Math.PI) / slots[r] - Math.PI/2;
           let x = CX + radios[r] * Math.cos(ang);
@@ -319,7 +318,6 @@
           let equipo = DATA.bracket[r + '_' + i] || "";
 
           let g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-          
           let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
           c.setAttribute("cx", x); 
           c.setAttribute("cy", y); 
@@ -338,11 +336,9 @@
           g.appendChild(c);
           
           if(equipo && equipo !== "Eliminado") {
-            // Limpia el nombre borrando los emojis problemáticos
             let nombreLimpio = equipo.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
             let flagCode = FLAG_MAP[nombreLimpio];
 
-            // Dibuja la imagen de la bandera dentro del círculo
             if(flagCode) {
               let img = document.createElementNS("http://www.w3.org/2000/svg", "image");
               img.setAttribute("href", `https://flagcdn.com/w40/${flagCode}.png`);
@@ -356,7 +352,6 @@
               g.appendChild(img);
             }
 
-            // Pone el texto limpio debajo del círculo
             let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
             tNombre.setAttribute("x", x);
             tNombre.setAttribute("y", y + radioCirculo + 14); 
@@ -375,7 +370,6 @@
       if(camp) {
         let nombreLimpio = camp.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
         let flagCode = FLAG_MAP[nombreLimpio];
-        
         let trofeoHTML = flagCode 
             ? `<img src="https://flagcdn.com/w80/${flagCode}.png" style="width:60px; height:60px; object-fit:cover; border-radius:50%; box-shadow: 0 0 10px rgba(0,0,0,0.2);"><br>${nombreLimpio}`
             : nombreLimpio;
@@ -393,5 +387,3 @@
       }
     }
   </script>
-</body>
-</html>
