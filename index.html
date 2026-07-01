@@ -21,6 +21,7 @@
       overflow-x: hidden; 
     }
     
+    h1 { text-align: center; font-size: 26px; text-shadow: 0 4px 15px rgba(0,0,0,0.6); margin-bottom: 20px;}
     .secret-btn { cursor: pointer; filter: drop-shadow(0 2px 8px rgba(0,242,254,0.4)); transition: transform 0.2s; display: inline-block;}
     .secret-btn:active { transform: scale(0.8); }
     
@@ -39,6 +40,7 @@
     .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); margin-bottom: 20px;}
     button { background: #00f2fe; color: #0f172a; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); width: 100%;}
     button:hover { filter: brightness(1.2); }
+    .btn-secondary { background: rgba(0,242,254,0.1); border: 1px solid #00f2fe; color: #00f2fe; box-shadow: none; }
     input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.6); color: white; box-sizing: border-box;}
     input:focus { border-color: #00f2fe; outline: none; }
     
@@ -87,10 +89,13 @@
     .profile-stat { background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;}
     .profile-stat h2 { margin: 0; font-size: 28px; color: #00f2fe; }
     .profile-stat small { color: #94a3b8; font-size: 12px; }
+    
+    .empty-state { text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.2); margin-top: 10px;}
   </style>
 </head>
 <body>
 
+  <!-- CABECERA CON BOTÓN DE CERRAR SESIÓN -->
   <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; position:relative;">
     <div style="flex:1;"></div>
     
@@ -99,12 +104,13 @@
     </h1>
     
     <div style="flex:1; text-align:right; padding-top: 5px;">
-      <button id="btnGlobalLogout" onclick="cerrarSesionGlobal()" style="display:none; width:auto; padding:8px 12px; font-size:11px; background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f8fafc; border-radius:8px; box-shadow:none; cursor:pointer; transition:0.3s;">❌ Cerrar Sesión</button>
+      <button id="btnGlobalLogout" onclick="cerrarSesionGlobal()" style="display:none; width:auto; padding:8px 12px; font-size:11px; background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f8fafc; border-radius:8px; box-shadow:none; cursor:pointer; transition:0.3s;">❌ Cerrar</button>
     </div>
   </div>
 
   <div class="loader" id="loader">Cargando base de datos global...</div>
 
+  <!-- PESTAÑA 1: MUNDIALISTA -->
   <div id="tab-bracket" class="tab-content active">
     <div class="glass-panel" style="padding:0; overflow:hidden;">
       <div class="svg-wrapper" id="svgContainer">
@@ -113,6 +119,7 @@
     </div>
   </div>
 
+  <!-- PESTAÑA 2: AL MARCADOR -->
   <div id="tab-matches" class="tab-content">
     <div class="glass-panel">
       <h3 style="margin-top:0; color:#00f2fe; text-align:center;">⚽ Pronósticos ($30 MXN)</h3>
@@ -121,27 +128,30 @@
     </div>
   </div>
 
+  <!-- PESTAÑA 3: MI PERFIL -->
   <div id="tab-profile" class="tab-content">
     <div class="glass-panel" id="profileLogin">
       <h3 style="text-align:center;">👤 Mi Perfil</h3>
       <p style="font-size:13px; color:#cbd5e1; text-align:center; margin-bottom:20px;">Ingresa tu código único de 6 dígitos para ver tu historial y deuda.</p>
       <input type="text" id="perfilCode" placeholder="Ingresa tu código" style="text-transform: uppercase; text-align:center; font-size:18px; letter-spacing: 2px;">
-      <button onclick="cargarPerfil()">Ver estado de cuenta</button>
+      <button onclick="cargarPerfilClick()">Ver estado de cuenta</button>
       
       <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 30px 0 20px 0;">
       <h4 style="text-align:center; color:#94a3b8; margin: 0 0 10px 0;">¿Aún no tienes código?</h4>
       <input type="text" id="reqPhone" placeholder="Tu número telefónico">
-      <button onclick="solicitarCodigoWhatsApp()" style="background:transparent; border:1px solid #00f2fe; color:#00f2fe; box-shadow:none;">📲 Generar mi Código de Acceso</button>
+      <button onclick="solicitarCodigoWhatsApp()" class="btn-secondary">📲 Generar mi Código de Acceso</button>
     </div>
     <div class="glass-panel" id="profileData" style="display:none;"></div>
   </div>
 
+  <!-- NAVEGACIÓN INFERIOR -->
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('tab-bracket', this)"><i>🏆</i>Mundialista</div>
-    <div class="nav-item" onclick="switchTab('tab-matches', this)"><i>⚽</i>Apuestas</div>
-    <div class="nav-item" onclick="switchTab('tab-profile', this)"><i>👤</i>Mi Perfil</div>
+    <div class="nav-item active" id="nav-bracket" onclick="switchTab('tab-bracket', this)"><i>🏆</i>Mundialista</div>
+    <div class="nav-item" id="nav-matches" onclick="switchTab('tab-matches', this)"><i>⚽</i>Apuestas</div>
+    <div class="nav-item" id="nav-profile" onclick="switchTab('tab-profile', this)"><i>👤</i>Mi Perfil</div>
   </div>
 
+  <!-- MODAL DINÁMICO DE REGISTRO / APUESTAS -->
   <div class="modal-overlay" id="authModal">
     <div class="modal-box" id="modalDynamic"></div>
   </div>
@@ -156,7 +166,6 @@
     let CODIGO_ACTIVO = null; 
     let ES_ADMIN = false;
 
-    // Diccionario de banderas para los 32 equipos
     const FLAG_MAP = {
       "Sudáfrica": "za", "Canadá": "ca", "Países Bajos": "nl", "Marruecos": "ma",
       "Francia": "fr", "Suecia": "se", "Alemania": "de", "Paraguay": "py",
@@ -183,6 +192,11 @@
         if (DATA.error) { alert("Error en la base de datos: " + DATA.error); return; }
         dibujarBracket(); 
         renderizarPartidos();
+        
+        // Si el usuario ya está autenticado, refrescar su perfil silenciosamente
+        if (CODIGO_ACTIVO) {
+            renderizarPerfilActivo();
+        }
       } catch (error) {
         document.getElementById('loader').innerText = "Fallo de conexión con Google. Recarga la página.";
       }
@@ -195,17 +209,21 @@
       document.getElementById(tabId).classList.add('active'); 
       el.classList.add('active');
       if(tabId === 'tab-bracket' && DATA) dibujarBracket();
+      
+      // Si el usuario ya está logueado y entra a perfil, cargar la info directa
+      if(tabId === 'tab-profile' && CODIGO_ACTIVO) {
+          renderizarPerfilActivo();
+      }
     }
 
-    // CONTROL DEL BOTÓN GLOBAL DE CERRAR SESIÓN
     function actualizarBotonLogout() {
       let btn = document.getElementById('btnGlobalLogout');
       if (ES_ADMIN) {
         btn.style.display = 'inline-block';
-        btn.innerHTML = '❌ Cerrar Admin';
+        btn.innerHTML = '❌ Admin';
       } else if (CODIGO_ACTIVO) {
         btn.style.display = 'inline-block';
-        btn.innerHTML = '❌ Cerrar Sesión';
+        btn.innerHTML = '❌ Salir';
       } else {
         btn.style.display = 'none';
       }
@@ -216,14 +234,14 @@
       CODIGO_ACTIVO = null;
       document.getElementById('svgContainer').classList.remove('admin-mode');
       
-      // Reiniciar vista de Perfil
       document.getElementById('perfilCode').value = '';
       document.getElementById('profileLogin').style.display = 'block';
       document.getElementById('profileData').style.display = 'none';
       
       actualizarBotonLogout();
-      dibujarBracket(); // Refresca los clics de admin
+      dibujarBracket(); 
       alert("Sesión cerrada correctamente.");
+      switchTab('tab-bracket', document.getElementById('nav-bracket'));
     }
 
     async function enviarAccion(payload) {
@@ -251,7 +269,6 @@
       }
     }
 
-    // AUTENTICACIÓN CENTRAL
     async function triggerAuth() {
       let code = prompt("Introduce tu código de 6 dígitos o PIN de Admin:"); 
       if(!code) return;
@@ -271,7 +288,8 @@
       else if (r.valido && r.modo === 'activo') {
         CODIGO_ACTIVO = code.toUpperCase(); 
         actualizarBotonLogout();
-        alert("Código verificado. Ya estás inscrito en la Mundialista. Ve a la pestaña 'Mi Perfil' o 'Apuestas'.");
+        // Redirigir y cargar perfil
+        switchTab('tab-profile', document.getElementById('nav-profile'));
       }
       else alert(r.error || "Código no válido o inexistente.");
     }
@@ -300,7 +318,8 @@
         DATA = r; 
         document.getElementById('authModal').style.display = 'none'; 
         actualizarBotonLogout();
-        alert("¡Inscripción exitosa! Estás participando en la Quiniela Mundialista. Consulta tu saldo en 'Mi Perfil'."); 
+        alert("¡Inscripción exitosa! Estás participando en la Quiniela Mundialista."); 
+        switchTab('tab-profile', document.getElementById('nav-profile'));
       }
     }
 
@@ -339,8 +358,17 @@
 
     async function apostar(pId, valWDL) {
       if(!CODIGO_ACTIVO) {
-        CODIGO_ACTIVO = prompt("Para hacer una apuesta de $30 MXN, ingresa tu código personal de 6 dígitos:");
-        if(!CODIGO_ACTIVO) return;
+        let cod = prompt("Para hacer una apuesta de $30 MXN, ingresa tu código personal de 6 dígitos:");
+        if(!cod) return;
+        
+        // Autenticar código antes de apostar
+        let r = await enviarAccion({ accion: 'validarCodigo', codigo: cod.toUpperCase() });
+        if(r.valido && r.modo === 'activo') {
+            CODIGO_ACTIVO = cod.toUpperCase();
+            actualizarBotonLogout();
+        } else {
+            return alert(r.error || "Código no válido. Regístrate en el trofeo primero.");
+        }
       }
       
       let eq1 = DATA.partidos.find(x => x.id === pId).eq1;
@@ -348,20 +376,19 @@
       let optStr = valWDL === '1' ? 'Gana Local' : (valWDL === '2' ? 'Gana Visita' : 'Empate');
 
       if(confirm(`Estás apostando $30 MXN al pronóstico: "${optStr}" para el partido ${eq1} vs ${eq2}.\nEsta cantidad se sumará a tu Deuda. ¿Confirmar?`)) {
-        let payload = { accion: 'apostarWDL', codigo: CODIGO_ACTIVO.toUpperCase(), partidoId: pId, prediccion: valWDL };
+        let payload = { accion: 'apostarWDL', codigo: CODIGO_ACTIVO, partidoId: pId, prediccion: valWDL };
         let r = await enviarAccion(payload);
         if(r.error) alert("Error: " + r.error); 
         else { 
           DATA = r; 
-          actualizarBotonLogout();
           renderizarPartidos(); 
-          alert("¡Tu pronóstico ha sido registrado y el dinero se sumó a la bolsa y a tu deuda!"); 
+          alert("¡Tu pronóstico ha sido registrado y el dinero se sumó a la bolsa!"); 
         }
       }
     }
 
-    // PERFIL DEL USUARIO
-    async function cargarPerfil() {
+    // PERFIL DEL USUARIO - LÓGICA MEJORADA
+    async function cargarPerfilClick() {
       let code = document.getElementById('perfilCode').value.toUpperCase().trim();
       if (!code) return alert("Por favor ingresa un código.");
 
@@ -370,19 +397,63 @@
       if(r.valido && r.modo === 'activo') {
         CODIGO_ACTIVO = code;
         actualizarBotonLogout();
+        renderizarPerfilActivo();
+      } else {
+        alert(r.error || "Código no encontrado. Asegúrate de estar registrado.");
+      }
+    }
+
+    function renderizarPerfilActivo() {
+        if(!CODIGO_ACTIVO || !DATA) return;
         
-        let misPreds = DATA.predicciones.filter(p => p.cod === code);
-        let jugador = DATA.jugadores.find(j => j.cod === code);
+        let misPreds = DATA.predicciones.filter(p => p.cod === CODIGO_ACTIVO);
+        let jugador = DATA.jugadores.find(j => j.cod === CODIGO_ACTIVO);
         
         let deudaTotal = jugador.deuda || 0;
         let ganado = misPreds.reduce((sum, p) => sum + (Number(p.ganancia) || 0), 0);
-        let misEquipos = (jugador.eq && jugador.eq.length > 0) ? jugador.eq.join(', ') : "Aún no se realiza el sorteo.";
+        
+        // Mejor visualización del estado del Sorteo Mundialista
+        let misEquiposHTML = "";
+        if (jugador.eq && jugador.eq.length > 0) {
+            misEquiposHTML = `<span style="font-size: 16px;">${jugador.eq.join(', ')}</span>`;
+        } else {
+            misEquiposHTML = `<div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size: 20px;">⏳</span>
+                                <span style="color: #cbd5e1;"><b>Esperando Sorteo Oficial</b><br>Se te asignará tu equipo cuando inicie la quiniela.</span>
+                              </div>`;
+        }
+        
+        // Mejor visualización de Apuestas
+        let apuestasHTML = "";
+        if (misPreds.length === 0) {
+            apuestasHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 30px; margin-bottom: 10px;">⚽</div>
+                    <b style="color:white;">¡Aún no has hecho pronósticos!</b><br>
+                    <span style="font-size:12px; color:#94a3b8;">Gana dinero en efectivo apostando a los partidos de hoy.</span><br>
+                    <button onclick="switchTab('tab-matches', document.getElementById('nav-matches'))" style="margin-top: 15px; padding: 10px; width:auto; font-size: 13px;">Ir a la Sala de Apuestas</button>
+                </div>
+            `;
+        } else {
+            apuestasHTML = `<ul style="font-size:12px; padding-left:0; list-style:none; color:#cbd5e1; max-height: 250px; overflow-y: auto;">` + 
+            misPreds.map(p => {
+              let pData = DATA.partidos.find(x => x.id === p.pid);
+              let pNombre = pData ? `${pData.eq1} vs ${pData.eq2}` : `Partido ${p.pid}`;
+              let vStr = p.val === '1' ? 'Local' : (p.val === '2' ? 'Visita' : 'Empate');
+              return `<li style="margin-bottom:8px; background:rgba(0,0,0,0.2); padding:10px; border-radius:6px; border-left: 3px solid ${p.ganancia > 0 ? '#10b981' : '#475569'};">
+                <b>${pNombre}</b><br>
+                Pronosticaste: <b style="color:white;">${vStr}</b>
+                ${p.ganancia > 0 ? `<br><span style="color:#10b981; font-weight:bold;">✅ Premio Acertado: +$${p.ganancia.toFixed(2)} MXN</span>` : ''}
+              </li>`;
+            }).join('') + `</ul>`;
+        }
         
         let html = `
-          <h3 style="text-align:center; color:#00f2fe; margin-top:0;">Ficha de ${r.apodo}</h3>
+          <h3 style="text-align:center; color:#00f2fe; margin-top:0;">Ficha de ${jugador.apodo}</h3>
           
-          <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px;">
-            <b style="color:#00f2fe;">Tus equipos de la Mundialista:</b><br>${misEquipos}
+          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px; border-left: 4px solid #00f2fe;">
+            <b style="color:#00f2fe; display:block; margin-bottom:8px;">Tus equipos (Mundialista):</b>
+            ${misEquiposHTML}
           </div>
 
           <div style="display:flex; gap:10px;">
@@ -394,52 +465,28 @@
             </div>
           </div>
           
-          <h4 style="margin-bottom:10px;">Tus Apuestas Activas:</h4>
-          <ul style="font-size:12px; padding-left:0; list-style:none; color:#cbd5e1; max-height: 250px; overflow-y: auto;">
-            ${misPreds.length === 0 ? "<li>No has hecho apuestas todavía.</li>" : misPreds.map(p => {
-              let pData = DATA.partidos.find(x => x.id === p.pid);
-              let pNombre = pData ? `${pData.eq1} vs ${pData.eq2}` : `Partido ${p.pid}`;
-              let vStr = p.val === '1' ? 'Local' : (p.val === '2' ? 'Visita' : 'Empate');
-              return `<li style="margin-bottom:8px; background:rgba(0,0,0,0.2); padding:10px; border-radius:6px; border-left: 3px solid ${p.ganancia > 0 ? '#10b981' : '#475569'};">
-                <b>${pNombre}</b><br>
-                Pronosticaste: <b style="color:white;">${vStr}</b>
-                ${p.ganancia > 0 ? `<br><span style="color:#10b981; font-weight:bold;">✅ Premio Acertado: +$${p.ganancia.toFixed(2)} MXN</span>` : ''}
-              </li>`;
-            }).join('')}
-          </ul>
-          <p style="font-size:11px; text-align:center; color:#94a3b8; margin-top:20px;">Contacta al Administrador para liquidar tu deuda o cobrar ganancias.</p>
-          <button onclick="cerrarSesionGlobal()" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; box-shadow:none;">Cerrar Sesión</button>
+          <h4 style="margin-bottom:10px; margin-top: 20px;">Tus Apuestas Activas:</h4>
+          ${apuestasHTML}
         `;
+        
         document.getElementById('profileLogin').style.display = 'none';
         document.getElementById('profileData').innerHTML = html;
         document.getElementById('profileData').style.display = 'block';
-      } else {
-        alert(r.error || "Código no encontrado. Asegúrate de estar registrado.");
-      }
     }
 
     // MOTOR GRÁFICO ORIGAMI
     function dibujarBracket() {
-      const svg = document.getElementById('bracketSvg'); 
-      const isMobile = window.innerWidth <= 850;
-      
+      const svg = document.getElementById('bracketSvg'); const isMobile = window.innerWidth <= 850;
       svg.setAttribute("viewBox", isMobile ? "0 0 800 1200" : "0 0 1000 1000"); 
 
       if (!document.getElementById('pathLayer')) {
-        svg.innerHTML = `
-          <defs><clipPath id="circle-clip" clipPathUnits="objectBoundingBox"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs>
-          <g id="pathLayer"></g><g id="nodeLayer"></g><g id="championGroup"></g>
-        `;
+        svg.innerHTML = `<defs><clipPath id="circle-clip" clipPathUnits="objectBoundingBox"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs>
+          <g id="pathLayer"></g><g id="nodeLayer"></g><g id="championGroup"></g>`;
       }
       
-      let pathLayer = document.getElementById('pathLayer'); 
-      let nodeLayer = document.getElementById('nodeLayer'); 
-      let champGroup = document.getElementById('championGroup');
-      
-      const CX = 500, CY = 500; 
-      const radios = { R1: 450, R2: 360, R3: 260, R4: 170, R5: 85 }; 
-      const slots = { R1: 32, R2: 16, R3: 8, R4: 4, R5: 2 }; 
-      const rondas = Object.keys(slots);
+      let pathLayer = document.getElementById('pathLayer'); let nodeLayer = document.getElementById('nodeLayer'); let champGroup = document.getElementById('championGroup');
+      const CX = 500, CY = 500; const radios = { R1: 450, R2: 360, R3: 260, R4: 170, R5: 85 }; 
+      const slots = { R1: 32, R2: 16, R3: 8, R4: 4, R5: 2 }; const rondas = Object.keys(slots);
       let coords = {};
       
       rondas.forEach(r => {
@@ -453,8 +500,7 @@
             if (r === 'R1') { 
               x = isLeft ? 50 : 750; y = 40 + (isLeft ? i : i - 16) * 72; 
             } else {
-              let prevR = rondas[rondas.indexOf(r)-1]; 
-              let c1 = coords[prevR+'_'+(i*2)]; let c2 = coords[prevR+'_'+(i*2+1)];
+              let prevR = rondas[rondas.indexOf(r)-1]; let c1 = coords[prevR+'_'+(i*2)]; let c2 = coords[prevR+'_'+(i*2+1)];
               let offset = { R2: 150, R3: 250, R4: 330, R5: 385 }[r]; 
               x = isLeft ? offset : 800 - offset; y = (c1.y + c2.y) / 2; 
             }
@@ -514,7 +560,7 @@
               let partidoRealId = r + "_" + Math.floor(i/2); 
 
               let res = await enviarAccion({ accion: 'avanzarManual', ronda: proxRonda, slot: Math.floor(i/2), equipoAvanza: equipo, partidoId: partidoRealId, g1: g1, g2: g2 });
-              if(res && !res.error) { DATA = res; dibujarBracket(); renderizarPartidos(); alert("¡Marcador registrado! Bolsa repartida a ganadores y equipo avanzado."); } 
+              if(res && !res.error) { DATA = res; dibujarBracket(); renderizarPartidos(); alert("¡Marcador registrado! Bolsa repartida a ganadores."); } 
               else if(res.error) alert(res.error);
             };
           } else g.onclick = null;
