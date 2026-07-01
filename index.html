@@ -5,113 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quiniela Mundial 2026</title>
   <style>
+    /* NUEVO TEMA INMERSIVO (DARK/GLASSMORPHISM) */
     :root { 
-      --bg-color: #f7f5f0; 
-      --primary: #1e293b; 
-      --accent: #06b6d4; 
-      --border: #cbd5e1;
-      --text-main: #334155; 
+      --accent: #00f2fe; /* Neón Turquesa */
+      --text-main: #f8fafc;
+      --glass-bg: rgba(15, 23, 42, 0.4);
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
     
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; overflow-x: hidden; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      /* Fondo azul profundo geométrico basado en tu imagen */
+      background: linear-gradient(135deg, #020024 0%, #090979 35%, #00d4ff 100%);
+      background-attachment: fixed;
+      color: var(--text-main); 
+      margin: 0; 
+      padding: 15px; 
+      overflow-x: hidden;
+    }
     
-    .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1300px; margin: 0 auto 20px auto; flex-wrap: wrap; gap: 15px; }
-    .header-bar h1 { margin: 0; font-size: 24px; color: var(--primary); text-align: center; flex: 1 1 100%; }
-    @media (min-width: 768px) { .header-bar h1 { text-align: left; flex: 1; font-size: 28px; } }
-
-    .admin-buttons { display: flex; gap: 10px; justify-content: center; width: 100%; }
-    @media (min-width: 768px) { .admin-buttons { width: auto; justify-content: flex-end; } }
-
-    .btn-admin-login { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; max-width: 200px;}
-    .btn-admin-login:hover { background: var(--primary); color: white; }
-    .btn-admin-logout { display: none; background: #ef4444; border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; max-width: 200px;}
-    .btn-admin-logout:hover { background: #dc2626; }
+    .header-bar { display: flex; justify-content: center; align-items: center; margin: 0 auto 30px auto; text-align: center;}
+    .header-bar h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     
-    .container { max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .secret-btn { cursor: pointer; transition: transform 0.2s; display: inline-block; }
+    .secret-btn:active { transform: scale(0.8); }
+
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
     .top-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; }
     @media (min-width: 1024px) { .top-layout { flex-direction: row; align-items: flex-start; } }
 
-    .panel { background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 15px; width: 100%; box-sizing: border-box; }
+    /* ESTILO GLASSMORPHISM (Sin cajas blancas) */
+    .glass-panel { 
+      background: var(--glass-bg); 
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border); 
+      border-radius: 16px; 
+      padding: 20px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
     .sidebar { display: none; width: 100%; }
-    @media (min-width: 1024px) { .sidebar { max-width: 320px; } }
+    @media (min-width: 1024px) { .sidebar { max-width: 350px; } }
     .admin-controls-active { display: block !important; }
     
-    .bracket-panel { flex: 1 1 auto; min-height: 600px; display: flex; flex-direction: column; overflow: hidden; }
+    .bracket-panel { flex: 1 1 auto; min-height: 600px; display: flex; flex-direction: column; overflow: hidden; padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important;}
     .svg-wrapper { width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
     svg { width: 100%; height: 100%; max-height: 85vh; display: block; margin: 0 auto; transition: all 0.5s ease-in-out; }
     
-    .input-group { display: flex; gap: 8px; margin-bottom: 20px; margin-top: 10px; flex-wrap: wrap; }
-    input[type="text"] { flex: 1 1 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; } 
-    button { background: var(--primary); color: white; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1 1 100%; }
-    .btn-danger { background: #e11d48; padding: 12px; margin-bottom: 15px; }
+    button { background: var(--accent); color: #0f172a; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1 1 100%; transition: 0.3s; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);}
+    button:hover { filter: brightness(1.2); }
+    .btn-danger { background: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); color: white;}
     
-    ul.player-list { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; margin-bottom: 0;}
-    ul.player-list li { padding: 10px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 14px;}
-    ul.player-list li small { color: #64748b; font-weight: bold; }
+    ul.player-list { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; margin-bottom: 0;}
+    ul.player-list li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 15px;}
+    ul.player-list li small { color: var(--accent); font-weight: bold; }
+    
+    .del-btn { background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; flex: 0 0 auto; box-shadow: none;}
+
+    /* MODAL DE REGISTRO FLOTANTE */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+    .modal-box { background: #0f172a; padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--accent); color: white; box-shadow: 0 0 30px rgba(0,242,254,0.2);}
+    .modal-box h3 { margin-top: 0; color: var(--accent); }
+    .modal-box input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; box-sizing: border-box;}
+    .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; margin-bottom: 20px; font-size: 14px; }
 
     /* ========================================= */
-    /* ESTILOS DE NODOS Y ANIMACIONES            */
+    /* ANIMACIONES DEL ÁRBOL (16 EQUIPOS)        */
     /* ========================================= */
-    .node-link { fill: none; stroke: #e2e8f0; stroke-width: 2.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .node-link.active { stroke: var(--accent); stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 20 8; animation: fluidFlow 0.4s linear infinite; filter: drop-shadow(0px 0px 6px rgba(6, 182, 212, 0.8)); }
+    .node-link { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 2.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .node-link.active { stroke: var(--accent); stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 20 8; animation: fluidFlow 0.5s linear infinite; filter: drop-shadow(0px 0px 8px var(--accent)); }
     @keyframes fluidFlow { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
     
     .node-group { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .node-circle { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; transition: transform 0.2s, stroke 0.3s; }
-    .node-circle.active { stroke: var(--accent); fill: #ecfeff; stroke-width: 2.5; }
+    .node-circle { fill: #1e293b; stroke: rgba(255,255,255,0.3); stroke-width: 2; transition: transform 0.2s, stroke 0.3s; }
+    .node-circle.active { stroke: var(--accent); fill: #0f172a; stroke-width: 3; }
     
-    /* EFECTO PARA LOS EQUIPOS ELIMINADOS */
-    .eliminated-node { opacity: 0.35; filter: grayscale(100%); transition: all 0.5s ease; }
-    .eliminated-node:hover { opacity: 0.9; filter: grayscale(0%); } /* Se ilumina un poco si el admin lo toca */
-
-    .frontier-spark { stroke: #ffffff !important; stroke-width: 4 !important; fill: #cffafe !important; animation: sparkImpact 1.2s infinite alternate ease-in-out; }
-    @keyframes sparkImpact { 0% { filter: drop-shadow(0 0 5px var(--accent)); transform: scale(1.1); } 100% { filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 10px #ffffff); transform: scale(1.4); } }
+    .eliminated-node { opacity: 0.25; filter: grayscale(100%); transition: all 0.5s ease; }
+    .frontier-spark { stroke: #ffffff !important; fill: #1e293b !important; animation: sparkImpact 1.2s infinite alternate ease-in-out; }
+    @keyframes sparkImpact { 0% { filter: drop-shadow(0 0 5px var(--accent)); transform: scale(1.1); } 100% { filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 10px #ffffff); transform: scale(1.3); } }
 
     .glowing-champion { animation: lightningGlow 2.5s infinite ease-in-out; }
-    @keyframes lightningGlow { 0% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); transform: scale(1); } 50% { filter: drop-shadow(0 0 25px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 15px rgba(214, 175, 55, 0.6)); transform: scale(1.05); } 100% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); transform: scale(1); } }
+    @keyframes lightningGlow { 0% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); transform: scale(1); } 50% { filter: drop-shadow(0 0 30px rgba(0, 242, 254, 1)) drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); transform: scale(1.05); } 100% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); transform: scale(1); } }
     
     .admin-mode .node-group { cursor: pointer; }
-    .admin-mode .node-group:not(.eliminated-node):hover .node-circle { transform: scale(1.3); stroke: var(--primary); }
-    .node-text { font-weight: 700; pointer-events: none; font-family: sans-serif; letter-spacing: -0.2px;}
+    .admin-mode .node-group:not(.eliminated-node):hover .node-circle { transform: scale(1.3); stroke: white; }
+    .node-text { font-weight: 700; pointer-events: none; font-family: sans-serif; fill: white;}
     
-    .mapping-section { width: 100%; }
-    .grid-mapping { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 15px; }
-    .card-map { padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .card-map b { color: #0284c7; }
+    .grid-mapping { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .card-map { padding: 12px; border: 1px solid var(--glass-border); border-radius: 8px; background: rgba(0,0,0,0.3); font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: white;}
+    .card-map b { color: var(--accent); }
     
-    .loader { text-align: center; width: 100%; padding: 40px; color: #64748b; font-style: italic; }
+    .loader { text-align: center; width: 100%; padding: 40px; color: var(--accent); font-style: italic; }
   </style>
 </head>
 <body>
 
   <div class="header-bar">
-    <h1>🏆 Quiniela Mundial 2026</h1>
-    <div class="admin-buttons">
-      <button class="btn-admin-login" id="btnLogin" onclick="loginAdmin()">🔐 Modo Admin</button>
-      <button class="btn-admin-logout" id="btnLogout" onclick="logoutAdmin()">❌ Cerrar Admin</button>
-    </div>
+    <h1><span class="secret-btn" onclick="triggerAuth()">🏆</span> Quiniela Mundial 2026</h1>
   </div>
 
   <div class="container" id="mainContainer">
-    <div class="loader" id="loader">Conectando a base de datos...</div>
+    <div class="loader" id="loader">Cargando base de datos global...</div>
+  </div>
+
+  <div class="modal-overlay" id="registroModal">
+    <div class="modal-box">
+      <h3>🎟️ Inscripción a la Quiniela</h3>
+      <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Código verificado con éxito.</p>
+      
+      <div class="warning-box">
+        <b>Atención:</b> La inscripción en la quiniela tiene un costo de <b>$50 MXN</b>.
+      </div>
+
+      <input type="text" id="regNombre" placeholder="Tu Nombre Real">
+      <input type="text" id="regApodo" placeholder="Tu Apodo/Nickname">
+      
+      <button onclick="finalizarRegistro()" style="margin-bottom: 10px;">Aceptar y Registrarme</button>
+      <button onclick="cerrarModal()" style="background: transparent; color: white; border: 1px solid #334155; box-shadow: none;">Cancelar</button>
+    </div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyizNP6mZogEqYC_2TiZSz7BT30G5QTNZw3dD-siePBX3chUzAfHyZEFNItniT4ktg4/exec"; 
+    const API_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; // ¡Pega tu nueva URL aquí!
     
     let ES_ADMIN = false;
     let DATA = null;
+    let CODIGO_ACTIVO = null;
 
-    // Se actualizó Irlanda por Costa de Marfil (ci)
     const FLAG_MAP = {
       "Brasil": "br", "Japón": "jp", "Costa de Marfil": "ci", "Noruega": "no",
       "México": "mx", "Ecuador": "ec", "Inglaterra": "gb-eng", "RD Congo": "cd",
       "Argentina": "ar", "Cabo Verde": "cv", "Australia": "au", "Egipto": "eg",
-      "Suiza": "ch", "Argelia": "dz", "Colombia": "co", "Ghana": "gh",
-      "Senegal": "sn", "Bélgica": "be", "Bosnia": "ba", "EE.UU.": "us",
-      "Austria": "at", "España": "es", "Croacia": "hr", "Portugal": "pt",
-      "Marruecos": "ma", "Países Bajos": "nl", "Canadá": "ca", "Sudáfrica": "za",
-      "Suecia": "se", "Francia": "fr", "Paraguay": "py", "Alemania": "de"
+      "España": "es", "Canadá": "ca", "Francia": "fr", "Alemania": "de"
     };
 
     window.onload = () => {
@@ -122,115 +150,123 @@
     async function cargarDatosIniciales() {
       try {
         let respuesta = await fetch(API_URL, { redirect: 'follow' });
-        if (!respuesta.ok) throw new Error();
         DATA = await respuesta.json();
         construirInterfaz();
         renderizarDatos();
       } catch (error) {
-        document.getElementById('loader').innerText = "⚠️ Error al conectar. Recarga la página.";
+        document.getElementById('loader').innerText = "Error al conectar. Recarga la página.";
       }
     }
 
     async function enviarAccion(payload) {
-      try {
-        document.body.style.cursor = 'wait';
-        let respuesta = await fetch(API_URL, { 
-          method: 'POST', 
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify(payload), 
-          redirect: 'follow' 
-        });
-        let nuevaData = await respuesta.json();
-        document.body.style.cursor = 'default';
-        if(nuevaData.error) throw new Error(nuevaData.error);
-        return nuevaData;
-      } catch (error) {
-        document.body.style.cursor = 'default';
-        alert("Error de conexión.");
-        return null;
+      document.body.style.cursor = 'wait';
+      let respuesta = await fetch(API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload), redirect: 'follow' });
+      let nuevaData = await respuesta.json();
+      document.body.style.cursor = 'default';
+      return nuevaData;
+    }
+
+    async function triggerAuth() {
+      let code = prompt("Introduce tu código de acceso:");
+      if(!code) return;
+      
+      let res = await enviarAccion({ accion: 'validarCodigo', codigo: code });
+      
+      if (res && res.valido) {
+        if (res.tipo === 'admin') {
+          ES_ADMIN = true;
+          document.getElementById('sidebarAdmin').classList.add('admin-controls-active');
+          document.getElementById('svgContainer').classList.add('admin-mode');
+          dibujarBracket();
+        } else if (res.tipo === 'user') {
+          CODIGO_ACTIVO = res.codigo;
+          document.getElementById('registroModal').style.display = 'flex';
+        }
+      } else {
+        alert(res.error || "Código incorrecto");
       }
     }
 
-    async function loginAdmin() {
-      let pin = prompt("Introduce el PIN de administrador:");
-      if(!pin) return;
-      let res = await enviarAccion({ accion: 'validarPin', pin: pin });
-      if (res && res.valido) {
-        ES_ADMIN = true;
-        document.getElementById('sidebarAdmin').classList.add('admin-controls-active');
-        document.getElementById('svgContainer').classList.add('admin-mode');
-        document.getElementById('btnLogin').style.display = 'none';
-        document.getElementById('btnLogout').style.display = 'inline-block';
-        dibujarBracket(); 
-      } else { alert("PIN incorrecto"); }
+    function cerrarModal() {
+      document.getElementById('registroModal').style.display = 'none';
+      CODIGO_ACTIVO = null;
     }
-    
-    function logoutAdmin() {
-      ES_ADMIN = false;
-      document.getElementById('sidebarAdmin').classList.remove('admin-controls-active');
-      document.getElementById('svgContainer').classList.remove('admin-mode');
-      document.getElementById('btnLogin').style.display = 'inline-block';
-      document.getElementById('btnLogout').style.display = 'none';
-      dibujarBracket();
+
+    async function finalizarRegistro() {
+      let nombre = document.getElementById('regNombre').value.trim();
+      let apodo = document.getElementById('regApodo').value.trim();
+      
+      if(!nombre || !apodo) return alert("Llena todos los campos");
+      
+      let res = await enviarAccion({ 
+        accion: 'registrarUsuario', 
+        datos: { nombre: nombre, apodo: apodo, codigo: CODIGO_ACTIVO } 
+      });
+      
+      if(res) {
+        DATA = res;
+        cerrarModal();
+        alert("¡Registro exitoso! Por favor espera a que el administrador realice el sorteo.");
+        renderizarDatos();
+      }
+    }
+
+    async function eliminarJugador(nombreJugador) {
+      if(confirm(`¿Seguro que deseas eliminar a ${nombreJugador}?`)) {
+        let res = await enviarAccion({ accion: 'eliminarJugador', nombre: nombreJugador });
+        if(res) { DATA = res; renderizarDatos(); }
+      }
+    }
+
+    async function cerrarQuiniela() {
+      if(confirm("¿Seguro? Esto repartirá los 16 equipos aleatoriamente.")) {
+        let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
+        if(res) { DATA = res; renderizarDatos(); }
+      }
     }
 
     function construirInterfaz() {
       const container = document.getElementById('mainContainer');
       container.innerHTML = `
         <div class="top-layout">
-          <div class="sidebar panel" id="sidebarAdmin">
-            <h3 style="margin-top:0; text-align:center;">🛠 Panel de Control</h3>
-            <div class="input-group">
-              <input type="text" id="txtNombre" placeholder="Nombre jugador...">
-              <button onclick="anadirJugador()">Añadir</button>
-            </div>
-            <button class="btn-danger" id="btnCerrar" onclick="cerrarQuiniela()">🔒 Cerrar y Sortear</button>
-            <hr style="border:0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-            <h4 style="margin: 0 0 10px 0;">Participantes (<span id="numJugadores">0</span>)</h4>
+          <div class="sidebar glass-panel" id="sidebarAdmin">
+            <h3 style="margin-top:0; text-align:center; color:var(--accent);">🛠 Panel de Admin</h3>
+            <button class="btn-danger" id="btnCerrar" onclick="cerrarQuiniela()" style="margin-top: 10px;">🔒 Iniciar Sorteo</button>
+            <hr style="border:0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+            <h4 style="margin: 0 0 10px 0;">Registros (<span id="numJugadores">0</span>)</h4>
             <ul id="listaJugadores" class="player-list"></ul>
           </div>
           
-          <div class="panel bracket-panel">
+          <div class="bracket-panel">
             <div class="svg-wrapper" id="svgContainer">
               <svg id="bracketSvg" viewBox="0 0 1000 1000"></svg>
             </div>
           </div>
         </div>
-        <div class="mapping-section panel">
-          <h3 style="margin-top:0;">📋 Reparto de Países</h3>
+        <div class="glass-panel" style="margin-top: 20px;">
+          <h3 style="margin-top:0;">📋 Asignaciones</h3>
           <div id="gridMapping" class="grid-mapping"></div>
         </div>
       `;
       if(ES_ADMIN) { document.getElementById('sidebarAdmin').classList.add('admin-controls-active'); document.getElementById('svgContainer').classList.add('admin-mode'); }
     }
 
-    async function anadirJugador() {
-      let txt = document.getElementById('txtNombre');
-      if(txt.value.trim()) {
-        txt.disabled = true;
-        let res = await enviarAccion({ accion: 'agregarJugador', nombre: txt.value.trim() });
-        if(res) { DATA = res; txt.value = ''; renderizarDatos(); }
-        txt.disabled = false;
-      }
-    }
-
-    async function cerrarQuiniela() {
-      if(confirm("¿Seguro? Esto repartirá los equipos.")) {
-        document.getElementById('btnCerrar').disabled = true;
-        let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
-        if(res) { DATA = res; renderizarDatos(); }
-      }
-    }
-
     function renderizarDatos() {
       document.getElementById('numJugadores').innerText = DATA.jugadores.length;
-      document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `<li><span>👤 ${j.nombre}</span> <small>${j.equipos.length} eq.</small></li>`).join('');
+      document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `
+        <li>
+          <span>👤 ${j.nombre}</span> 
+          <div style="display:flex; gap:10px; align-items:center;">
+            <small>${j.equipos.length} eq.</small>
+            ${ES_ADMIN ? `<button class="del-btn" onclick="eliminarJugador('${j.nombre}')">X</button>` : ''}
+          </div>
+        </li>
+      `).join('');
       
       let btnCerrar = document.getElementById('btnCerrar');
       if(DATA.estado === 'Cerrada') {
         btnCerrar.innerText = "Sorteo Finalizado";
         btnCerrar.disabled = true;
-        document.getElementById('txtNombre').disabled = true;
       }
 
       dibujarBracket();
@@ -242,41 +278,30 @@
         let nombreLimpio = e.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
         let flagCode = FLAG_MAP[nombreLimpio];
         let imgHtml = flagCode ? `<img src="https://flagcdn.com/w20/${flagCode}.png" style="vertical-align:middle; margin-right:5px; border-radius:2px;">` : '';
-        let nombreMostrado = dueno ? dueno.nombre : "<span style='color:#94a3b8;'>Sin asignar</span>";
+        let nombreMostrado = dueno ? dueno.nombre : "<span style='color:rgba(255,255,255,0.3);'>Esperando sorteo</span>";
         return `<div class="card-map"><span>${imgHtml}${nombreLimpio}</span> <b>${nombreMostrado}</b></div>`;
       }).join('');
     }
 
     // =========================================================================
-    // MOTOR GRÁFICO (REAJUSTE MÓVIL Y EQUIPOS ELIMINADOS)
+    // MATEMÁTICAS ORIGAMI PARA 16 EQUIPOS (Octavos)
     // =========================================================================
     function dibujarBracket() {
       const svg = document.getElementById('bracketSvg');
       const isMobile = window.innerWidth <= 850;
       
-      // EL CAMBIO DE MÓVIL: Redujimos el ancho del ViewBox a 750 para comprimir los espacios vacíos
-      svg.setAttribute("viewBox", isMobile ? "0 0 750 1200" : "0 0 1000 1000");
+      svg.setAttribute("viewBox", isMobile ? "0 0 750 900" : "0 0 1000 1000");
 
       if (!document.getElementById('pathLayer')) {
-        svg.innerHTML = `
-          <defs>
-            <clipPath id="circle-clip" clipPathUnits="objectBoundingBox">
-              <circle cx="0.5" cy="0.5" r="0.5"></circle>
-            </clipPath>
-          </defs>
-          <g id="pathLayer"></g>
-          <g id="nodeLayer"></g>
-          <g id="championGroup"></g>
-        `;
+        svg.innerHTML = `<defs><clipPath id="circle-clip" clipPathUnits="objectBoundingBox"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs><g id="pathLayer"></g><g id="nodeLayer"></g><g id="championGroup"></g>`;
       }
 
-      let pathLayer = document.getElementById('pathLayer');
-      let nodeLayer = document.getElementById('nodeLayer');
-      let champGroup = document.getElementById('championGroup');
+      let pathLayer = document.getElementById('pathLayer'); let nodeLayer = document.getElementById('nodeLayer'); let champGroup = document.getElementById('championGroup');
       
       const CX = 500, CY = 500;
-      const radios = { R1: 440, R2: 355, R3: 270, R4: 185, R5: 95 };
-      const slots = { R1: 32, R2: 16, R3: 8, R4: 4, R5: 2 };
+      // Ajuste de radios para 4 rondas (16 equipos)
+      const radios = { R1: 400, R2: 280, R3: 160, R4: 70 };
+      const slots = { R1: 16, R2: 8, R3: 4, R4: 2 };
       const rondas = Object.keys(slots);
 
       let coords = {};
@@ -291,13 +316,13 @@
           } else {
             let isLeft = i < (slots[r] / 2);
             if (r === 'R1') {
-              x = isLeft ? 50 : 700; // Ajustado al nuevo ancho de 750
-              y = 50 + (isLeft ? i : i - 16) * 73; 
+              x = isLeft ? 50 : 700; 
+              y = 80 + (isLeft ? i : i - 8) * 90; // Mayor separación para 16
             } else {
               let prevR = rondas[rondas.indexOf(r) - 1];
               let child1 = coords[prevR + '_' + (i*2)];
               let child2 = coords[prevR + '_' + (i*2+1)];
-              let offset = { 'R2': 130, 'R3': 210, 'R4': 280, 'R5': 330 }[r]; 
+              let offset = { 'R2': 150, 'R3': 250, 'R4': 320 }[r]; 
               x = isLeft ? offset : 750 - offset;
               y = (child1.y + child2.y) / 2; 
             }
@@ -306,196 +331,98 @@
         }
       });
 
-      // 1. DIBUJAMOS LOS CONECTORES
+      // 1. CONECTORES
       for (let r = 0; r < rondas.length - 1; r++) {
         let rAct = rondas[r], rSig = rondas[r+1];
         for (let i = 0; i < slots[rAct]; i++) {
-          let p1 = coords[rAct + '_' + i];
-          let p2 = coords[rSig + '_' + Math.floor(i/2)];
-          let pM;
-          
+          let p1 = coords[rAct + '_' + i]; let p2 = coords[rSig + '_' + Math.floor(i/2)]; let pM;
           if (!isMobile) {
-            let rMedio = (radios[rAct] + radios[rSig]) / 2;
-            let ang1 = (i * 2 * Math.PI) / slots[rAct] - Math.PI/2;
+            let rMedio = (radios[rAct] + radios[rSig]) / 2; let ang1 = (i * 2 * Math.PI) / slots[rAct] - Math.PI/2;
             pM = { x: CX + rMedio * Math.cos(ang1), y: CY + rMedio * Math.sin(ang1) };
-          } else {
-            pM = { x: p2.x, y: p1.y };
-          }
+          } else { pM = { x: p2.x, y: p1.y }; }
 
-          let pathId = `link_${rAct}_${i}`;
-          let path = document.getElementById(pathId);
-          if (!path) {
-            path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.id = pathId;
-            path.setAttribute("class", "node-link");
-            pathLayer.appendChild(path);
-          }
+          let pathId = `link_${rAct}_${i}`; let path = document.getElementById(pathId);
+          if (!path) { path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.id = pathId; path.setAttribute("class", "node-link"); pathLayer.appendChild(path); }
           
-          let equipoOrigen = DATA.bracket[rAct + '_' + i];
-          let equipoDestino = DATA.bracket[rSig + '_' + Math.floor(i/2)];
-
-          if(equipoOrigen && equipoOrigen !== "Eliminado" && equipoOrigen === equipoDestino) {
-            path.classList.add('active');
-          } else {
-            path.classList.remove('active');
-          }
-
+          let equipoOrigen = DATA.bracket[rAct + '_' + i]; let equipoDestino = DATA.bracket[rSig + '_' + Math.floor(i/2)];
+          if(equipoOrigen && equipoOrigen !== "Eliminado" && equipoOrigen === equipoDestino) path.classList.add('active'); else path.classList.remove('active');
           path.setAttribute("d", `M ${p1.x} ${p1.y} L ${pM.x} ${pM.y} L ${p2.x} ${p2.y}`);
         }
       }
 
-      // 2. NODOS, FRONTERA Y ELIMINADOS
+      // 2. NODOS
       rondas.forEach(r => {
-        // TAMAÑO DINÁMICO: 25% más grandes en celular
-        let radioCirculo = isMobile ? 20 : 16; 
-        
+        let radioCirculo = isMobile ? 22 : 20; 
         for(let i=0; i<slots[r]; i++) {
-          let pos = coords[r + '_' + i];
-          let equipo = DATA.bracket[r + '_' + i] || "";
-
-          let isFrontier = false;
-          let isEliminated = false;
+          let pos = coords[r + '_' + i]; let equipo = DATA.bracket[r + '_' + i] || "";
+          let isFrontier = false, isEliminated = false;
           
           if (equipo && equipo !== "Eliminado") {
-            let proxR = { R1:'R2', R2:'R3', R3:'R4', R4:'R5', R5:'Campeon' }[r];
+            let proxR = { R1:'R2', R2:'R3', R3:'R4', R4:'Campeon' }[r];
             let proxSlot = (proxR === 'Campeon') ? 0 : Math.floor(i/2);
             let equipoSiguiente = DATA.bracket[proxR + '_' + proxSlot];
-            
-            if (!equipoSiguiente) {
-              isFrontier = true; // El equipo sigue vivo y es su posición más alta
-            } else if (equipoSiguiente !== equipo && equipoSiguiente !== "Eliminado") {
-              isEliminated = true; // El equipo perdió
-            }
+            if (!equipoSiguiente) isFrontier = true; 
+            else if (equipoSiguiente !== equipo && equipoSiguiente !== "Eliminado") isEliminated = true;
           }
 
-          let groupId = `node_${r}_${i}`;
-          let g = document.getElementById(groupId);
-
+          let groupId = `node_${r}_${i}`; let g = document.getElementById(groupId);
           if (!g) {
-            g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            g.id = groupId;
-            g.setAttribute("class", "node-group");
-            
-            let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            c.setAttribute("cx", 0); c.setAttribute("cy", 0); c.setAttribute("r", radioCirculo);
-            c.setAttribute("class", "node-circle");
-            g.appendChild(c);
-            nodeLayer.appendChild(g);
+            g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = groupId; g.setAttribute("class", "node-group");
+            let c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("cx", 0); c.setAttribute("cy", 0); c.setAttribute("class", "node-circle"); g.appendChild(c); nodeLayer.appendChild(g);
           }
           
-          // Actualizamos el radio por si el usuario cambia de PC a Móvil dinámicamente
-          let c = g.querySelector('.node-circle');
-          c.setAttribute("r", radioCirculo);
-          g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
-
-          // Asignación de clases
-          g.className.baseVal = "node-group" + (isEliminated ? " eliminated-node" : "");
-          c.className.baseVal = "node-circle"; 
+          let c = g.querySelector('.node-circle'); c.setAttribute("r", radioCirculo); g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
+          g.className.baseVal = "node-group" + (isEliminated ? " eliminated-node" : ""); c.className.baseVal = "node-circle"; 
           
-          if(equipo && equipo !== "Eliminado") {
-            c.classList.add("active");
-            if (isFrontier) c.classList.add("frontier-spark"); 
-          }
+          if(equipo && equipo !== "Eliminado") { c.classList.add("active"); if (isFrontier) c.classList.add("frontier-spark"); }
 
           let oldImg = g.querySelector('image'); let oldText = g.querySelector('text');
           if (oldImg) oldImg.remove(); if (oldText) oldText.remove();
 
           if(ES_ADMIN && equipo && equipo !== "Eliminado") {
             g.onclick = async () => {
-              let prox = { R1:'R2', R2:'R3', R3:'R4', R4:'R5', R5:'Campeon' }[r];
+              let prox = { R1:'R2', R2:'R3', R3:'R4', R4:'Campeon' }[r];
               let res = await enviarAccion({ accion: 'avanzar', ronda: prox, slot: Math.floor(i/2), equipo: equipo });
               if(res) { DATA = res; renderizarDatos(); }
             };
           } else { g.onclick = null; }
 
           if(equipo && equipo !== "Eliminado") {
-            let nombreLimpio = equipo.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
-            let flagCode = FLAG_MAP[nombreLimpio];
-
+            let nombreLimpio = equipo.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim(); let flagCode = FLAG_MAP[nombreLimpio];
             if(flagCode) {
-              let img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-              img.setAttribute("href", `https://flagcdn.com/w40/${flagCode}.png`);
-              img.setAttribute("x", -radioCirculo); img.setAttribute("y", -radioCirculo);
-              img.setAttribute("width", radioCirculo * 2); img.setAttribute("height", radioCirculo * 2);
-              img.setAttribute("preserveAspectRatio", "xMidYMid slice");
-              img.setAttribute("clip-path", "url(#circle-clip)");
-              img.style.pointerEvents = "none"; 
-              g.appendChild(img);
+              let img = document.createElementNS("http://www.w3.org/2000/svg", "image"); img.setAttribute("href", `https://flagcdn.com/w40/${flagCode}.png`);
+              img.setAttribute("x", -radioCirculo); img.setAttribute("y", -radioCirculo); img.setAttribute("width", radioCirculo * 2); img.setAttribute("height", radioCirculo * 2);
+              img.setAttribute("preserveAspectRatio", "xMidYMid slice"); img.setAttribute("clip-path", "url(#circle-clip)"); img.style.pointerEvents = "none"; g.appendChild(img);
             }
-
             let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            tNombre.setAttribute("x", 0); 
-            tNombre.setAttribute("y", radioCirculo + (isMobile ? 14 : 13)); 
-            tNombre.setAttribute("text-anchor", "middle");
-            tNombre.setAttribute("class", "node-text");
-            tNombre.setAttribute("font-size", isMobile ? "12px" : "11px");
-            tNombre.setAttribute("fill", "var(--primary)");
-            tNombre.textContent = nombreLimpio;
-            g.appendChild(tNombre);
+            tNombre.setAttribute("x", 0); tNombre.setAttribute("y", radioCirculo + 16); tNombre.setAttribute("text-anchor", "middle"); tNombre.setAttribute("class", "node-text");
+            tNombre.setAttribute("font-size", isMobile ? "12px" : "12px"); tNombre.textContent = nombreLimpio; g.appendChild(tNombre);
           }
         }
       });
 
-      // 3. EL CAMPEÓN
+      // 3. CAMPEÓN
       let camp = DATA.bracket['Campeon_0'];
-      let campX = isMobile ? 375 : CX; // Centrado exacto en Móvil (375 = mitad de 750)
-      let campY = isMobile ? coords['R5_0'].y : CY; 
-
-      champGroup.setAttribute("transform", `translate(${campX}, ${campY})`);
-      champGroup.innerHTML = ''; 
+      let campX = isMobile ? 375 : CX; let campY = isMobile ? coords['R4_0'].y : CY; 
+      champGroup.setAttribute("transform", `translate(${campX}, ${campY})`); champGroup.innerHTML = ''; 
 
       if (camp) {
-         let nombreLimpio = camp.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim();
-         let flagCode = FLAG_MAP[nombreLimpio];
-         let d = DATA.jugadores.find(j => j.equipos.includes(camp));
-         let dueno = d ? d.nombre : "S/A";
-
+         let nombreLimpio = camp.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim(); let flagCode = FLAG_MAP[nombreLimpio];
+         let d = DATA.jugadores.find(j => j.equipos.includes(camp)); let dueno = d ? d.nombre : "S/A";
          champGroup.setAttribute("class", "node-group glowing-champion");
-
          let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-         circle.setAttribute("cx", 0); circle.setAttribute("cy", -15); circle.setAttribute("r", 38);
-         circle.setAttribute("fill", "#ecfeff"); circle.setAttribute("stroke", "var(--accent)"); circle.setAttribute("stroke-width", "3.5");
-         champGroup.appendChild(circle);
-
+         circle.setAttribute("cx", 0); circle.setAttribute("cy", -15); circle.setAttribute("r", 40); circle.setAttribute("fill", "#ecfeff"); circle.setAttribute("stroke", "var(--accent)"); circle.setAttribute("stroke-width", "3.5"); champGroup.appendChild(circle);
          if(flagCode) {
-           let img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-           img.setAttribute("href", `https://flagcdn.com/w80/${flagCode}.png`);
-           img.setAttribute("x", -32); img.setAttribute("y", -47);
-           img.setAttribute("width", 64); img.setAttribute("height", 64);
-           img.setAttribute("preserveAspectRatio", "xMidYMid slice");
-           img.setAttribute("clip-path", "url(#circle-clip)");
-           champGroup.appendChild(img);
+           let img = document.createElementNS("http://www.w3.org/2000/svg", "image"); img.setAttribute("href", `https://flagcdn.com/w80/${flagCode}.png`);
+           img.setAttribute("x", -34); img.setAttribute("y", -49); img.setAttribute("width", 68); img.setAttribute("height", 68);
+           img.setAttribute("preserveAspectRatio", "xMidYMid slice"); img.setAttribute("clip-path", "url(#circle-clip)"); champGroup.appendChild(img);
          }
-
-         let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tNombre.setAttribute("x", 0); tNombre.setAttribute("y", 42);
-         tNombre.setAttribute("text-anchor", "middle");
-         tNombre.setAttribute("font-size", "16"); tNombre.setAttribute("font-weight", "bold"); tNombre.setAttribute("fill", "var(--primary)");
-         tNombre.textContent = nombreLimpio;
-         champGroup.appendChild(tNombre);
-
-         let tDueno = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tDueno.setAttribute("x", 0); tDueno.setAttribute("y", 60);
-         tDueno.setAttribute("text-anchor", "middle");
-         tDueno.setAttribute("font-size", "13"); tDueno.setAttribute("fill", "#0284c7"); tDueno.setAttribute("font-weight", "bold");
-         tDueno.textContent = "🥇 Ganador: " + dueno;
-         champGroup.appendChild(tDueno);
+         let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text"); tNombre.setAttribute("x", 0); tNombre.setAttribute("y", 45); tNombre.setAttribute("text-anchor", "middle"); tNombre.setAttribute("font-size", "16"); tNombre.setAttribute("font-weight", "bold"); tNombre.setAttribute("fill", "white"); tNombre.textContent = nombreLimpio; champGroup.appendChild(tNombre);
+         let tDueno = document.createElementNS("http://www.w3.org/2000/svg", "text"); tDueno.setAttribute("x", 0); tDueno.setAttribute("y", 65); tDueno.setAttribute("text-anchor", "middle"); tDueno.setAttribute("font-size", "14"); tDueno.setAttribute("fill", "var(--accent)"); tDueno.setAttribute("font-weight", "bold"); tDueno.textContent = "🥇 Ganador: " + dueno; champGroup.appendChild(tDueno);
       } else {
          champGroup.setAttribute("class", "node-group");
-
-         let tTrofeo = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tTrofeo.setAttribute("x", 0); tTrofeo.setAttribute("y", -5);
-         tTrofeo.setAttribute("text-anchor", "middle");
-         tTrofeo.setAttribute("font-size", "42");
-         tTrofeo.textContent = "🏆";
-         champGroup.appendChild(tTrofeo);
-
-         let tEspera = document.createElementNS("http://www.w3.org/2000/svg", "text");
-         tEspera.setAttribute("x", 0); tEspera.setAttribute("y", 28);
-         tEspera.setAttribute("text-anchor", "middle");
-         tEspera.setAttribute("font-size", "14"); tEspera.setAttribute("fill", "#64748b"); tEspera.setAttribute("font-weight", "bold");
-         tEspera.textContent = "Esperando Campeón";
-         champGroup.appendChild(tEspera);
+         let tTrofeo = document.createElementNS("http://www.w3.org/2000/svg", "text"); tTrofeo.setAttribute("x", 0); tTrofeo.setAttribute("y", -5); tTrofeo.setAttribute("text-anchor", "middle"); tTrofeo.setAttribute("font-size", "45"); tTrofeo.textContent = "🏆"; champGroup.appendChild(tTrofeo);
+         let tEspera = document.createElementNS("http://www.w3.org/2000/svg", "text"); tEspera.setAttribute("x", 0); tEspera.setAttribute("y", 30); tEspera.setAttribute("text-anchor", "middle"); tEspera.setAttribute("font-size", "14"); tEspera.setAttribute("fill", "rgba(255,255,255,0.5)"); tEspera.setAttribute("font-weight", "bold"); tEspera.textContent = "Esperando Campeón"; champGroup.appendChild(tEspera);
       }
     }
   </script>
