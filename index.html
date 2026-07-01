@@ -3,448 +3,306 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Quiniela Mundial 2026</title>
+  <title>Quiniela Premium 2026</title>
   <style>
-    :root { 
-      --accent: #00f2fe; 
-      --text-main: #f8fafc;
-      --glass-bg: rgba(15, 23, 42, 0.35);
-      --glass-border: rgba(255, 255, 255, 0.08);
-    }
+    :root { var(--accent): #00f2fe; var(--bg-dark): #020024; var(--glass-bg): rgba(15, 23, 42, 0.45); }
+    body { font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #020024 0%, #090979 40%, #0072ff 100%); background-attachment: fixed; color: #f8fafc; margin: 0; padding: 10px 10px 80px 10px; overflow-x: hidden; }
+    h1 { text-align: center; font-size: 26px; text-shadow: 0 4px 15px rgba(0,0,0,0.6); margin-bottom: 20px;}
+    .secret-btn { cursor: pointer; filter: drop-shadow(0 2px 8px rgba(0,242,254,0.4)); }
     
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: linear-gradient(135deg, #020024 0%, #090979 40%, #0072ff 100%);
-      background-attachment: fixed;
-      color: var(--text-main); 
-      margin: 0; 
-      padding: 15px; 
-      overflow-x: hidden;
-    }
-    
-    .header-bar { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; text-align: center;}
-    .header-bar h1 { margin: 0; font-size: 30px; font-weight: 800; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
-    
-    .secret-btn { cursor: pointer; transition: transform 0.2s; display: inline-block; filter: drop-shadow(0 2px 8px rgba(0,242,254,0.4)); }
-    .secret-btn:hover { transform: scale(1.1); }
+    .tab-content { display: none; animation: fadeIn 0.4s; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 25px; }
-    .top-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; }
-    @media (min-width: 1024px) { .top-layout { flex-direction: row; align-items: flex-start; } }
+    /* NAVEGACIÓN INFERIOR (TABS) */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(2,0,36,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.1); z-index: 100; }
+    .nav-item { color: rgba(255,255,255,0.5); text-align: center; font-size: 12px; cursor: pointer; flex: 1; font-weight: bold; transition: 0.3s;}
+    .nav-item.active { color: #00f2fe; text-shadow: 0 0 10px rgba(0,242,254,0.5); }
+    .nav-item i { display: block; font-size: 20px; margin-bottom: 4px; }
 
-    .glass-panel { 
-      background: var(--glass-bg); 
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border); 
-      border-radius: 16px; 
-      padding: 20px; width: 100%; box-sizing: border-box; 
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    }
+    /* ESTILOS GLOBALES Y CRISTALINOS */
+    .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); margin-bottom: 20px;}
+    button { background: #00f2fe; color: #0f172a; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); width: 100%;}
+    input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.6); color: white; box-sizing: border-box;}
+    
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(2,0,36,0.85); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
+    .modal-box { background: #0f172a; padding: 25px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); color: white; }
 
-    .sidebar { display: none; width: 100%; }
-    @media (min-width: 1024px) { .sidebar { max-width: 340px; } }
-    .admin-controls-active { display: block !important; }
-    
-    .bracket-panel { flex: 1 1 auto; min-height: 600px; display: flex; flex-direction: column; overflow: hidden; padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important;}
-    .svg-wrapper { width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-    svg { width: 100%; height: 100%; max-height: 85vh; display: block; margin: 0 auto; transition: all 0.5s ease-in-out; }
-    
-    input, select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.6); color: white; box-sizing: border-box; font-size: 15px;}
-    input:focus { border-color: var(--accent); outline: none; }
-    
-    button { background: var(--accent); color: #0f172a; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1 1 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);}
-    button:hover { filter: brightness(1.2); transform: translateY(-1px); }
-    .btn-danger { background: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); color: white;}
-    
-    ul.player-list { list-style: none; padding: 0; max-height: 250px; overflow-y: auto;}
-    ul.player-list li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; font-size: 14px;}
-    
-    .del-btn { background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; flex: 0 0 auto; box-shadow: none;}
+    /* PESTAÑA 1: BRACKET ORIGAMI (32 EQUIPOS) */
+    .svg-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
+    svg { width: 100%; max-height: 80vh; transition: all 0.5s; }
+    .node-link { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 2.5; }
+    .node-link.active { stroke: #00f2fe; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 25 8; animation: fluidFlow 0.3s linear infinite; filter: drop-shadow(0px 0px 8px #00f2fe); }
+    @keyframes fluidFlow { from { stroke-dashoffset: 33; } to { stroke-dashoffset: 0; } }
+    .node-circle { fill: #111827; stroke: rgba(255,255,255,0.2); stroke-width: 2; }
+    .node-circle.active { stroke: #00f2fe; fill: #030712; stroke-width: 3; }
+    .eliminated-node { opacity: 0.3; filter: grayscale(100%); transition: all 0.5s; }
+    .node-text { font-size: 9px; font-weight: bold; fill: #fff; pointer-events: none; }
 
-    /* MODALES FLOTANTES */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,0,36,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);}
-    .modal-box { background: #0f172a; padding: 25px; border-radius: 16px; width: 92%; max-width: 380px; border: 1px solid rgba(255,255,255,0.1); color: white; box-shadow: 0 0 35px rgba(0,242,254,0.15);}
-    .modal-box h3 { margin-top: 0; color: var(--accent); font-size: 20px; }
-    .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; margin-bottom: 15px; font-size: 13px; border-radius: 0 8px 8px 0; }
-    .pool-box { background: rgba(0, 242, 254, 0.08); border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 15px; font-size: 13px; border-radius: 0 8px 8px 0; }
-
-    /* ========================================= */
-    /* ANIMACIÓN LIQUIDA FLUIDA DE LOS RAYOS      */
-    /* ========================================= */
-    .node-link { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 2.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .node-link.active { 
-      stroke: var(--accent); stroke-width: 4.5; stroke-linecap: round; 
-      stroke-dasharray: 30 10; /* Trazos largos simulando flujo continuo de agua */
-      animation: fluidFlow 0.3s linear infinite; /* Alta velocidad, movimiento orgánico */
-      filter: drop-shadow(0px 0px 8px var(--accent)); 
-    }
-    @keyframes fluidFlow { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+    /* PESTAÑA 2: APUESTAS Y PREDICCIONES */
+    .match-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+    .match-title { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: 5px;}
+    .match-date { font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 15px; }
+    .wdl-group { display: flex; gap: 5px; margin-bottom: 15px; }
+    .wdl-btn { flex: 1; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; font-size: 12px; text-align: center; cursor: pointer;}
+    .wdl-btn:hover { background: rgba(0,242,254,0.2); border-color: #00f2fe; }
+    .wdl-stats { font-size: 10px; color: #00f2fe; margin-top: 4px; display: block;}
     
-    .node-group { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .node-circle { fill: #111827; stroke: rgba(255,255,255,0.2); stroke-width: 2; transition: transform 0.2s, stroke 0.3s; }
-    .node-circle.active { stroke: var(--accent); fill: #030712; stroke-width: 3; }
-    
-    /* EQUIPOS ELIMINADOS EN BLANCO Y NEGRO TENUE */
-    .eliminated-node { opacity: 0.35; filter: grayscale(100%) contrast(85%); transition: all 0.6s ease; }
-
-    .frontier-spark { stroke: #ffffff !important; fill: #111827 !important; animation: sparkImpact 1.2s infinite alternate ease-in-out; }
-    @keyframes sparkImpact { 0% { filter: drop-shadow(0 0 4px var(--accent)); transform: scale(1.08); } 100% { filter: drop-shadow(0 0 18px var(--accent)) drop-shadow(0 0 8px #ffffff); transform: scale(1.25); } }
-    .glowing-champion { animation: lightningGlow 2.5s infinite ease-in-out; }
-    @keyframes lightningGlow { 0% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); } 50% { filter: drop-shadow(0 0 35px var(--accent)) drop-shadow(0 0 15px #fff); transform: scale(1.04); } 100% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); } }
-    
-    .admin-mode .node-group { cursor: pointer; }
-    .node-text { font-weight: 700; pointer-events: none; font-family: sans-serif; fill: #f1f5f9; letter-spacing: -0.3px;}
-    
-    /* GRILLA DE PARTIDOS Y BOLSAS */
-    .grid-matches { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-    .match-card { padding: 15px; border-radius: 12px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: space-between; }
-    .match-teams { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; margin-bottom: 10px; }
-    .match-info { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
-    .match-info b { color: var(--accent); font-size: 13px; }
+    /* PESTAÑA 3: PERFIL */
+    .profile-stat { background: rgba(0,242,254,0.1); border: 1px solid #00f2fe; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;}
+    .profile-stat h2 { margin: 0; font-size: 28px; color: #00f2fe; }
   </style>
 </head>
 <body>
 
-  <div class="header-bar">
-    <h1><span class="secret-btn" onclick="triggerAuth()">🏆</span> Quiniela Mundial 2026</h1>
-    <div style="margin-top: 12px; display:flex; gap:8px; max-width:400px; width:100%;" id="phoneRequestBox">
-      <input type="text" id="reqPhone" placeholder="Ej: 5213334874026" style="margin:0; padding:10px; font-size:14px;">
-      <button onclick="solicitarCodigoWhatsApp()" style="flex:0 0 auto; padding:10px 14px; font-size:13px;">📲 Recibir Código</button>
+  <h1><span class="secret-btn" onclick="triggerAuth()">🏆</span> Quiniela 2026</h1>
+
+  <!-- PESTAÑA 1: MUNDIALISTA -->
+  <div id="tab-bracket" class="tab-content active container">
+    <div class="glass-panel" style="padding:0; overflow:hidden;">
+      <div class="svg-wrapper" id="svgContainer"><svg id="bracketSvg" viewBox="0 0 1000 1000"></svg></div>
     </div>
   </div>
 
-  <div class="container" id="mainContainer">
-    <div class="loader" id="loader">Canalizando flujo de datos...</div>
+  <!-- PESTAÑA 2: AL MARCADOR -->
+  <div id="tab-matches" class="tab-content container">
+    <div class="glass-panel">
+      <h3 style="margin-top:0; color:#00f2fe; text-align:center;">⚽ Sala de Apuestas ($30 MXN)</h3>
+      <p style="font-size:12px; text-align:center; color:#cbd5e1;">Cierra 1 hora antes del partido.</p>
+      <div id="matchesList"></div>
+    </div>
   </div>
 
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-box" id="modalDynamicContent"></div>
+  <!-- PESTAÑA 3: MI PERFIL -->
+  <div id="tab-profile" class="tab-content container">
+    <div class="glass-panel" id="profileLogin">
+      <h3 style="text-align:center;">👤 Mi Perfil</h3>
+      <input type="text" id="perfilCode" placeholder="Ingresa tu código de 6 dígitos" style="text-transform: uppercase;">
+      <button onclick="cargarPerfil()">Ver mis apuestas</button>
+      
+      <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+      <h4 style="text-align:center; color:#94a3b8;">¿No tienes código?</h4>
+      <input type="text" id="reqPhone" placeholder="Tu WhatsApp (Ej: 521333...)">
+      <button onclick="solicitarCodigoWhatsApp()" style="background:transparent; border:1px solid #00f2fe; color:#00f2fe; box-shadow:none;">📲 Solicitar Código</button>
+    </div>
+    <div class="glass-panel" id="profileData" style="display:none;"></div>
   </div>
+
+  <!-- NAVEGACIÓN INFERIOR -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('tab-bracket', this)"><i>🏆</i>Mundialista</div>
+    <div class="nav-item" onclick="switchTab('tab-matches', this)"><i>⚽</i>Apuestas</div>
+    <div class="nav-item" onclick="switchTab('tab-profile', this)"><i>👤</i>Mi Perfil</div>
+  </div>
+
+  <!-- MODALES DE REGISTRO E INTERACCIÓN -->
+  <div class="modal-overlay" id="authModal"><div class="modal-box" id="modalDynamic"></div></div>
 
   <script>
-    // PEGA AQUÍ TU URL DE PUBLICACIÓN
+    // ==========================================
+    // ¡PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT!
+    // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyizNP6mZogEqYC_2TiZSz7BT30G5QTNZw3dD-siePBX3chUzAfHyZEFNItniT4ktg4/exec"; 
     
-    let ES_ADMIN = false; let DATA = null; let CODIGO_SESION = null;
+    let DATA = null; let CODIGO_ACTIVO = null; let ES_ADMIN = false;
+    const FLAG_MAP = { "Sudáfrica": "za", "Canadá": "ca", "Países Bajos": "nl", "Marruecos": "ma", "Francia": "fr", "Suecia": "se", "Alemania": "de", "Paraguay": "py", "Brasil": "br", "Japón": "jp", "Costa de Marfil": "ci", "Noruega": "no", "México": "mx", "Ecuador": "ec", "Inglaterra": "gb-eng", "RD Congo": "cd", "Bélgica": "be", "Senegal": "sn", "EE.UU.": "us", "Bosnia": "ba", "España": "es", "Austria": "at", "Portugal": "pt", "Croacia": "hr", "Suiza": "ch", "Argelia": "dz", "Australia": "au", "Egipto": "eg", "Argentina": "ar", "Cabo Verde": "cv", "Colombia": "co", "Ghana": "gh" };
 
-    const FLAG_MAP = {
-      "Brasil": "br", "Japón": "jp", "Costa de Marfil": "ci", "Noruega": "no",
-      "México": "mx", "Ecuador": "ec", "Inglaterra": "gb-eng", "RD Congo": "cd",
-      "Argentina": "ar", "Cabo Verde": "cv", "Australia": "au", "Egipto": "eg",
-      "España": "es", "Canadá": "ca", "Francia": "fr", "Alemania": "de"
+    window.onload = async () => {
+      let res = await fetch(API_URL); DATA = await res.json();
+      dibujarBracket(); renderizarPartidos(); window.addEventListener('resize', dibujarBracket);
     };
 
-    window.onload = () => { cargarDatosIniciales(); window.addEventListener('resize', () => { if(DATA) dibujarBracket(); }); };
-
-    async function cargarDatosIniciales() {
-      try {
-        let respuesta = await fetch(API_URL, { redirect: 'follow' });
-        DATA = await respuesta.json(); construirInterfaz(); renderizarDatos();
-      } catch (error) { document.getElementById('loader').innerText = "Fallo de conexión."; }
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active'); el.classList.add('active');
     }
 
     async function enviarAccion(payload) {
       document.body.style.cursor = 'wait';
-      let respuesta = await fetch(API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload), redirect: 'follow' });
-      let nuevaData = await respuesta.json(); document.body.style.cursor = 'default';
-      return nuevaData;
+      let r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      document.body.style.cursor = 'default'; return await r.json();
     }
 
     async function solicitarCodigoWhatsApp() {
-      let tel = document.getElementById('reqPhone').value.trim();
-      if(!tel) return alert("Ingresa tu número con clave de país.");
-      let res = await enviarAccion({ accion: 'solicitarCodigo', telefono: tel });
-      alert(res.msg);
+      let t = document.getElementById('reqPhone').value; if(!t) return;
+      let r = await enviarAccion({ accion: 'solicitarCodigo', telefono: t }); alert(r.msg);
     }
 
     async function triggerAuth() {
-      let code = prompt("Introduce tu Código único o PIN de Admin:");
-      if(!code) return;
-      let res = await enviarAccion({ accion: 'validarCodigo', codigo: code.toUpperCase().trim() });
-      
-      if (res && res.valido) {
-        CODIGO_SESION = res.codigo;
-        if (res.tipo === 'admin') {
-          ES_ADMIN = true; document.getElementById('sidebarAdmin').classList.add('admin-controls-active');
-          document.getElementById('svgContainer').classList.add('admin-mode'); dibujarBracket();
-        } else if (res.tipo === 'user' && res.modo === 'registro') {
-          openModalRegistro();
-        } else if (res.tipo === 'user' && res.modo === 'quiniela') {
-          openModalPrediccion(res.apodo);
-        }
-      } else { alert(res.error || "Código no válido."); }
+      let code = prompt("Código Admin o Registro:"); if(!code) return;
+      let r = await enviarAccion({ accion: 'validarCodigo', codigo: code.toUpperCase() });
+      if(r.valido && r.tipo === 'admin') { ES_ADMIN = true; alert("Admin Activado. Haz clic en el árbol para avanzar equipos."); }
+      else if(r.valido && r.modo === 'registro') { CODIGO_ACTIVO = code; mostrarRegistro(); }
+      else alert(r.error || "Código usado. Ve a Mi Perfil.");
     }
 
-    function openModalRegistro() {
-      let content = document.getElementById('modalDynamicContent');
-      content.innerHTML = `
-        <h3>🎟️ Formulario de Inscripción</h3>
-        <div class="warning-box">La inscripción para el sorteo de equipos tiene un costo de <b>$50 MXN</b>.</div>
-        <input type="text" id="regNombre" placeholder="Nombre completo">
-        <input type="text" id="regApodo" placeholder="Nickname / Apodo">
-        <button onclick="finalizarRegistro()">Confirmar Registro</button>
-        <button onclick="cerrarModal()" style="background:transparent; color:white; margin-top:8px; box-shadow:none;">Cerrar</button>
-      `;
-      document.getElementById('authModal').style.display = 'flex';
+    function mostrarRegistro() {
+      let html = `<h3>¡Código Válido!</h3><p>Costo Sorteo: <b>$50 MXN</b></p>
+        <input type="text" id="rNom" placeholder="Nombre completo">
+        <input type="text" id="rApo" placeholder="Nickname">
+        <button onclick="enviarRegistro()">Confirmar Inscripción</button>`;
+      document.getElementById('modalDynamic').innerHTML = html; document.getElementById('authModal').style.display = 'flex';
     }
 
-    function openModalPrediccion(apodo) {
-      let content = document.getElementById('modalDynamicContent');
-      let options = DATA.partidos.map(p => `<option value="${p.id}">${p.eq1} vs ${p.eq2}</option>`).join('');
-      content.innerHTML = `
-        <h3>⚽ Pronosticar Marcador</h3>
-        <p style="font-size:13px; color:#cbd5e1;">Hola <b>${apodo}</b>. Ingresa tu predicción.</p>
-        <div class="pool-box">Costo: <b>$30 MXN</b>. Si aciertas el marcador exacto, te llevas el acumulado total del partido.</div>
-        <select id="predPartidoId">${options}</select>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-          <input type="number" id="predG1" placeholder="Goles Eq 1" style="margin:0;">
-          <input type="number" id="predG2" placeholder="Goles Eq 2" style="margin:0;">
-        </div>
-        <button onclick="finalizarPrediccion()">Enviar Pronóstico y Apostar</button>
-        <button onclick="cerrarModal()" style="background:transparent; color:white; margin-top:8px; box-shadow:none;">Cerrar</button>
-      `;
-      document.getElementById('authModal').style.display = 'flex';
+    async function enviarRegistro() {
+      let r = await enviarAccion({ accion: 'registrarUsuario', datos: { nombre: document.getElementById('rNom').value, apodo: document.getElementById('rApo').value, codigo: CODIGO_ACTIVO } });
+      if(r && !r.error) { DATA = r; document.getElementById('authModal').style.display = 'none'; alert("¡Inscrito al sorteo mundialista!"); }
     }
 
-    function cerrarModal() { document.getElementById('authModal').style.display = 'none'; }
-
-    async function finalizarRegistro() {
-      let n = document.getElementById('regNombre').value.trim();
-      let a = document.getElementById('regApodo').value.trim();
-      if(!n || !a) return alert("Completa los datos.");
-      let res = await enviarAccion({ accion: 'registrarUsuario', datos: { nombre: n, apodo: a, codigo: CODIGO_SESION } });
-      if(res) { DATA = res; cerrarModal(); renderizarDatos(); alert("¡Inscrito! Espera el sorteo de equipos."); }
-    }
-
-    async function finalizarPrediccion() {
-      let pId = document.getElementById('predPartidoId').value;
-      let g1 = document.getElementById('predG1').value;
-      let g2 = document.getElementById('predG2').value;
-      if(g1 === "" || g2 === "") return alert("Ingresa los goles.");
-      
-      try {
-        let res = await enviarAccion({ accion: 'guardarPrediccion', codigo: CODIGO_SESION, partidoId: pId, goles1: g1, goles2: g2 });
-        if(res.error) throw new Error(res.error);
-        DATA = res; cerrarModal(); renderizarDatos(); alert("¡Pronóstico guardado y $30 agregados al pozo!");
-      } catch(e) { alert(e.message); }
-    }
-
-    async function eliminarJugador(nombre) {
-      if(confirm(`¿Eliminar a ${nombre}?`)) {
-        let res = await enviarAccion({ accion: 'eliminarJugador', nombre: nombre });
-        if(res) { DATA = res; renderizarDatos(); }
-      }
-    }
-
-    async function cerrarQuiniela() {
-      if(confirm("¿Sortear los 16 equipos?")) {
-        let res = await enviarAccion({ accion: 'cerrar', equipos: DATA.equiposIniciales });
-        if(res) { DATA = res; renderizarDatos(); }
-      }
-    }
-
-    function construirInterfaz() {
-      const container = document.getElementById('mainContainer');
-      container.innerHTML = `
-        <div class="top-layout">
-          <div class="sidebar glass-panel" id="sidebarAdmin">
-            <h3 style="margin-top:0; text-align:center; color:var(--accent);">🛠 Panel Control</h3>
-            <button class="btn-danger" id="btnCerrar" onclick="cerrarQuiniela()">🔒 Ejecutar Sorteo Aleatorio</button>
-            <hr style="border:0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-            <h4 style="margin: 0 0 10px 0;">Inscritos (<span id="numJugadores">0</span>)</h4>
-            <ul id="listaJugadores" class="player-list"></ul>
-          </div>
-          <div class="bracket-panel">
-            <div class="svg-wrapper" id="svgContainer"><svg id="bracketSvg" viewBox="0 0 1000 1000"></svg></div>
-          </div>
-        </div>
-        <div class="glass-panel">
-          <h3 style="margin-top:0; color:var(--accent);">⚽ Escrutinio de Partidos y Bolsas Acumuladas</h3>
-          <div id="gridMatches" class="grid-matches"></div>
-        </div>
-      `;
-      if(ES_ADMIN) { document.getElementById('sidebarAdmin').classList.add('admin-controls-active'); document.getElementById('svgContainer').classList.add('admin-mode'); }
-    }
-
-    function renderizarDatos() {
-      document.getElementById('numJugadores').innerText = DATA.jugadores.length;
-      document.getElementById('listaJugadores').innerHTML = DATA.jugadores.map(j => `
-        <li>
-          <span>👤 ${j.nombre}</span> 
-          <div style="display:flex; gap:10px; align-items:center;">
-            <small>${j.equipos.length ? 'Asignado' : 'Pendiente'}</small>
-            ${ES_ADMIN ? `<button class="del-btn" onclick="eliminarJugador('${j.nombre}')">Eliminar</button>` : ''}
-          </div>
-        </li>
-      `).join('');
-      
-      if(DATA.estado === 'Cerrada' && document.getElementById('btnCerrar')) {
-        document.getElementById('btnCerrar').innerText = "Sorteo Completado ✅";
-        document.getElementById('btnCerrar').disabled = true;
-      }
-
-      dibujarBracket();
-
-      // RENDERIZAR LA GRILLA DE BOLSAS ACUMULADAS Y MARCADORES ABAJO
-      let gridM = document.getElementById('gridMatches');
-      gridM.innerHTML = DATA.partidos.map(p => {
-        let marcadorReal = (p.g1 !== "") ? `<b>${p.g1} - ${p.g2}</b>` : `<span style="color:rgba(255,255,255,0.3)">Vs</span>`;
-        let horaLegible = new Date(p.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    // ===============================================
+    // SALA DE APUESTAS
+    // ===============================================
+    function renderizarPartidos() {
+      let html = '';
+      DATA.partidos.forEach(p => {
+        if(p.g1 !== "") return; // No mostrar finalizados
+        let d = new Date(p.f); let hora = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); let fecha = d.toLocaleDateString();
         
-        // Encontrar ganadores de esta bolsa
-        let ganadoresPart = DATA.predicciones.filter(pr => pr.partidoId === p.id && pr.premio === 'Ganador');
-        let txtGanadores = ganadoresPart.length 
-          ? `<div style="color:#10b981; font-size:11px; mt:5px;">🎉 Ganadores: ${ganadoresPart.map(g => {
-              let j = DATA.jugadores.find(jug => jug.codigo === g.codigo);
-              return j ? j.apodo : "Anónimo";
-            }).join(', ')}</div>` 
-          : '';
-
-        return `
-          <div class="match-card">
-            <div class="match-teams">
-              <span>${p.eq1}</span> ${marcadorReal} <span>${p.eq2}</span>
-            </div>
-            <div class="match-info">
-              <span>Hora: ${horaLegible}</span>
-              <span>Bolsa: <b>$${p.bolsa} MXN</b></span>
-            </div>
-            ${txtGanadores}
+        html += `
+        <div class="match-card">
+          <div class="match-date">📅 ${fecha} - ⏰ ${hora}</div>
+          <div class="match-title"><span>${p.eq1}</span> <span>vs</span> <span>${p.eq2}</span></div>
+          
+          <div style="font-size:12px; margin:10px 0 5px 0; color:#cbd5e1;">1. Gana, Empata o Pierde (Bolsa: <b>$${p.bW}</b>)</div>
+          <div class="wdl-group">
+            <div class="wdl-btn" onclick="apostar('${p.id}', 'WDL', '1')">Local <span class="wdl-stats">${p.stats.gana1}%</span></div>
+            <div class="wdl-btn" onclick="apostar('${p.id}', 'WDL', 'X')">Empate <span class="wdl-stats">${p.stats.empate}%</span></div>
+            <div class="wdl-btn" onclick="apostar('${p.id}', 'WDL', '2')">Visita <span class="wdl-stats">${p.stats.gana2}%</span></div>
           </div>
-        `;
-      }).join('');
+          
+          <div style="font-size:12px; margin:10px 0 5px 0; color:#cbd5e1;">2. Marcador Exacto (Bolsa: <b>$${p.bE}</b>)</div>
+          <div style="display:flex; gap:10px;">
+            <input type="number" id="g1_${p.id}" placeholder="Goles L" style="margin:0;">
+            <input type="number" id="g2_${p.id}" placeholder="Goles V" style="margin:0;">
+            <button style="flex:1; padding:8px; font-size:12px;" onclick="apostar('${p.id}', 'EXACTO')">Apostar</button>
+          </div>
+        </div>`;
+      });
+      document.getElementById('matchesList').innerHTML = html;
     }
 
-    function dibujarBracket() {
-      const svg = document.getElementById('bracketSvg'); const isMobile = window.innerWidth <= 850;
-      svg.setAttribute("viewBox", isMobile ? "0 0 750 900" : "0 0 1000 1000");
-
-      if (!document.getElementById('pathLayer')) {
-        svg.innerHTML = `<defs><clipPath id="circle-clip" clipPathUnits="objectBoundingBox"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs><g id="pathLayer"></g><g id="nodeLayer"></g><g id="championGroup"></g>`;
+    async function apostar(pId, tipo, valWDL) {
+      if(!CODIGO_ACTIVO) {
+        CODIGO_ACTIVO = prompt("Para apostar, ingresa tu código de 6 dígitos:");
+        if(!CODIGO_ACTIVO) return;
       }
+      if(confirm(`Esta apuesta descontará $30 MXN a tu cuenta. ¿Confirmar?`)) {
+        let payload = { accion: tipo === 'WDL' ? 'apostarWDL' : 'apostarExacto', codigo: CODIGO_ACTIVO.toUpperCase(), partidoId: pId };
+        if(tipo === 'WDL') payload.prediccion = valWDL;
+        else { payload.g1 = document.getElementById(`g1_${pId}`).value; payload.g2 = document.getElementById(`g2_${pId}`).value; }
+        
+        let r = await enviarAccion(payload);
+        if(r.error) alert(r.error); else { DATA = r; renderizarPartidos(); alert("¡Apuesta registrada con éxito!"); }
+      }
+    }
 
-      let pathLayer = document.getElementById('pathLayer'); let nodeLayer = document.getElementById('nodeLayer'); let champGroup = document.getElementById('championGroup');
-      const CX = 500, CY = 500;
-      const radios = { R1: 410, R2: 295, R3: 180, R4: 75 };
-      const slots = { R1: 16, R2: 8, R3: 4, R4: 2 };
-      const rondas = Object.keys(slots);
+    // ===============================================
+    // PERFIL DEL USUARIO
+    // ===============================================
+    async function cargarPerfil() {
+      let code = document.getElementById('perfilCode').value.toUpperCase();
+      let r = await enviarAccion({ accion: 'validarCodigo', codigo: code });
+      if(r.valido && r.modo === 'activo') {
+        CODIGO_ACTIVO = code;
+        let misPreds = DATA.predicciones.filter(p => p.cod === code);
+        let gastado = misPreds.length * 30;
+        let ganado = misPreds.reduce((sum, p) => sum + (Number(p.ganancia) || 0), 0);
+        
+        let html = `
+          <h3 style="text-align:center; color:#00f2fe;">Hola, ${r.apodo}</h3>
+          <div style="display:flex; gap:10px;">
+            <div class="profile-stat" style="flex:1;"><h2>$${gastado}</h2><small>Gastado</small></div>
+            <div class="profile-stat" style="flex:1; border-color:#10b981;">
+              <h2 style="color:#10b981;">$${ganado}</h2><small>Ganado</small>
+            </div>
+          </div>
+          <h4>Tus Predicciones:</h4>
+          <ul style="font-size:12px; padding-left:15px; color:#cbd5e1;">
+            ${misPreds.map(p => `<li>Partido ${p.pid} | ${p.tipo}: <b>${p.val}</b> ${p.ganancia > 0 ? '✅ ¡Ganaste $'+p.ganancia+'!' : ''}</li>`).join('')}
+          </ul>
+          <p style="font-size:11px; text-align:center; color:#ef4444;">Para cobrar tus ganancias contacta al Administrador.</p>
+          <button onclick="document.getElementById('profileLogin').style.display='block'; document.getElementById('profileData').style.display='none';" style="background:transparent; border:1px solid white; color:white; box-shadow:none;">Cerrar Sesión</button>
+        `;
+        document.getElementById('profileLogin').style.display = 'none';
+        document.getElementById('profileData').innerHTML = html;
+        document.getElementById('profileData').style.display = 'block';
+      } else alert(r.error || "Código no encontrado.");
+    }
 
+    // ===============================================
+    // MOTOR GRÁFICO (32 EQUIPOS - MUNDIALISTA)
+    // ===============================================
+    function dibujarBracket() {
+      const svg = document.getElementById('bracketSvg'); const isM = window.innerWidth <= 850;
+      svg.setAttribute("viewBox", isM ? "0 0 800 2000" : "0 0 1000 1000"); // Ampliado verticalmente para 32 equipos
+      if (!document.getElementById('pL')) svg.innerHTML = `<defs><clipPath id="cp"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs><g id="pL"></g><g id="nL"></g><g id="cG"></g>`;
+      
+      let pL = document.getElementById('pL'), nL = document.getElementById('nL'), cG = document.getElementById('cG');
+      const CX = 500, CY = 500; const radios = { R1: 450, R2: 360, R3: 270, R4: 180, R5: 90 }; const slots = { R1: 32, R2: 16, R3: 8, R4: 4, R5: 2 }; const rondas = Object.keys(slots);
+      
       let coords = {};
       rondas.forEach(r => {
         for(let i=0; i<slots[r]; i++) {
           let x, y;
-          if (!isMobile) {
+          if (!isM) {
             let ang = (i * 2 * Math.PI) / slots[r] - Math.PI/2;
             x = CX + radios[r] * Math.cos(ang); y = CY + radios[r] * Math.sin(ang);
           } else {
             let isLeft = i < (slots[r] / 2);
-            if (r === 'R1') { x = isLeft ? 50 : 700; y = 80 + (isLeft ? i : i - 8) * 98; }
+            if (r === 'R1') { x = isLeft ? 50 : 750; y = 50 + (isLeft ? i : i - 16) * 60; }
             else {
-              let prevR = rondas[rondas.indexOf(r) - 1];
-              let c1 = coords[prevR + '_' + (i*2)]; let c2 = coords[prevR + '_' + (i*2+1)];
-              let offset = { 'R2': 150, 'R3': 250, 'R4': 320 }[r];
-              x = isLeft ? offset : 750 - offset; y = (c1.y + c2.y) / 2;
+              let pR = rondas[rondas.indexOf(r)-1]; let c1 = coords[pR+'_'+(i*2)], c2 = coords[pR+'_'+(i*2+1)];
+              x = isLeft ? {R2:150,R3:250,R4:330,R5:380}[r] : 800 - {R2:150,R3:250,R4:330,R5:380}[r]; y = (c1.y + c2.y)/2;
             }
           }
           coords[r + '_' + i] = {x, y};
         }
       });
 
-      // CONECTORES FLUJO DE AGUA
       for (let r = 0; r < rondas.length - 1; r++) {
-        let rAct = rondas[r], rSig = rondas[r+1];
-        for (let i = 0; i < slots[rAct]; i++) {
-          let p1 = coords[rAct + '_' + i]; let p2 = coords[rSig + '_' + Math.floor(i/2)]; let pM;
-          if (!isMobile) {
-            let rMedio = (radios[rAct] + radios[rSig]) / 2; let ang1 = (i * 2 * Math.PI) / slots[rAct] - Math.PI/2;
-            pM = { x: CX + rMedio * Math.cos(ang1), y: CY + rMedio * Math.sin(ang1) };
-          } else { pM = { x: p2.x, y: p1.y }; }
-
-          let pathId = `link_${rAct}_${i}`; let path = document.getElementById(pathId);
-          if (!path) { path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.id = pathId; path.setAttribute("class", "node-link"); pathLayer.appendChild(path); }
+        let rA = rondas[r], rS = rondas[r+1];
+        for (let i = 0; i < slots[rA]; i++) {
+          let p1 = coords[rA+'_'+i], p2 = coords[rS+'_'+Math.floor(i/2)], pM;
+          if(!isM){ let rM = (radios[rA]+radios[rS])/2; let ang1 = (i*2*Math.PI)/slots[rA] - Math.PI/2; pM = {x:CX+rM*Math.cos(ang1), y:CY+rM*Math.sin(ang1)}; } else { pM = {x:p2.x, y:p1.y}; }
           
-          let eqO = DATA.bracket[rAct + '_' + i]; let eqD = DATA.bracket[rSig + '_' + Math.floor(i/2)];
+          let path = document.getElementById(`l_${rA}_${i}`); if (!path) { path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.id = `l_${rA}_${i}`; path.setAttribute("class", "node-link"); pL.appendChild(path); }
+          let eqO = DATA.bracket[rA+'_'+i], eqD = DATA.bracket[rS+'_'+Math.floor(i/2)];
           if(eqO && eqO !== "Eliminado" && eqO === eqD) path.classList.add('active'); else path.classList.remove('active');
           path.setAttribute("d", `M ${p1.x} ${p1.y} L ${pM.x} ${pM.y} L ${p2.x} ${p2.y}`);
         }
       }
 
-      // NODOS Y FRONTERAS
       rondas.forEach(r => {
-        let radioCirculo = isMobile ? 22 : 20;
         for(let i=0; i<slots[r]; i++) {
-          let pos = coords[r + '_' + i]; let equipo = DATA.bracket[r + '_' + i] || "";
-          let isFrontier = false, isEliminated = false;
+          let eq = DATA.bracket[r+'_'+i] || "", rad = isM ? 16 : 14, g = document.getElementById(`n_${r}_${i}`);
+          if (!g) { g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = `n_${r}_${i}`; let c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("class", "node-circle"); g.appendChild(c); nL.appendChild(g); }
           
-          if (equipo && equipo !== "Eliminado") {
-            let proxR = { R1:'R2', R2:'R3', R3:'R4', R4:'Campeon' }[r];
-            let proxSlot = (proxR === 'Campeon') ? 0 : Math.floor(i/2);
-            let equipoSiguiente = DATA.bracket[proxR + '_' + proxSlot];
-            if (!equipoSiguiente) isFrontier = true;
-            else if (equipoSiguiente !== equipo && equipoSiguiente !== "Eliminado") isEliminated = true;
+          let c = g.querySelector('circle'); c.setAttribute("r", rad); g.setAttribute("transform", `translate(${coords[r+'_'+i].x}, ${coords[r+'_'+i].y})`);
+          let isE = false, isF = false;
+          if(eq && eq !== "Eliminado") {
+            let nS = DATA.bracket[{R1:'R2',R2:'R3',R3:'R4',R4:'R5',R5:'Campeon'}[r]+'_'+(r==='R5'?0:Math.floor(i/2))];
+            if(!nS) isF = true; else if(nS !== eq && nS !== "Eliminado") isE = true;
           }
+          g.className.baseVal = "node-group" + (isE ? " eliminated-node" : ""); c.className.baseVal = "node-circle" + (eq&&eq!=="Eliminado"?" active":"") + (isF?" frontier-spark":"");
+          let oI = g.querySelector('image'), oT = g.querySelector('text'); if(oI) oI.remove(); if(oT) oT.remove();
 
-          let groupId = `node_${r}_${i}`; let g = document.getElementById(groupId);
-          if (!g) {
-            g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = groupId; g.setAttribute("class", "node-group");
-            let c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("cx", 0); c.setAttribute("cy", 0); c.setAttribute("class", "node-circle"); g.appendChild(c); nodeLayer.appendChild(g);
-          }
-          
-          let c = g.querySelector('.node-circle'); c.setAttribute("r", radioCirculo); g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
-          g.className.baseVal = "node-group" + (isEliminated ? " eliminated-node" : ""); c.className.baseVal = "node-circle";
-          
-          if(equipo && equipo !== "Eliminado") { c.classList.add("active"); if (isFrontier) c.classList.add("frontier-spark"); }
-
-          let oldImg = g.querySelector('image'); let oldText = g.querySelector('text');
-          if (oldImg) oldImg.remove(); if (oldText) oldText.remove();
-
-          if(ES_ADMIN && equipo && equipo !== "Eliminado") {
+          if(ES_ADMIN && eq && eq !== "Eliminado") {
             g.onclick = async () => {
-              let g1 = prompt("Goles de " + equipo + ":", "0");
-              let g2 = prompt("Goles del rival:", "0");
-              if (g1 === null || g2 === null) return;
-              let prox = { R1:'R2', R2:'R3', R3:'R4', R4:'Campeon' }[r];
-              let res = await enviarAccion({ accion: 'avanzarManual', ronda: prox, slot: Math.floor(i/2), equipo: equipo, goles1: g1, goles2: g2 });
-              if(res) { DATA = res; renderizarDatos(); }
+              let g1 = prompt(`Goles de ${eq}:`, "0"), g2 = prompt("Goles del rival:", "0"); if(g1===null||g2===null) return;
+              let rA = await enviarAccion({ accion: 'avanzarManual', partidoId: r+'_'+Math.floor(i/2), g1: g1, g2: g2, equipoAvanza: eq });
+              if(rA) { DATA = rA; dibujarBracket(); renderizarPartidos(); }
             };
-          } else { g.onclick = null; }
+          } else g.onclick = null;
 
-          if(equipo && equipo !== "Eliminado") {
-            let nombreLimpio = equipo.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim(); let flagCode = FLAG_MAP[nombreLimpio];
-            if(flagCode) {
-              let img = document.createElementNS("http://www.w3.org/2000/svg", "image"); img.setAttribute("href", `https://flagcdn.com/w40/${flagCode}.png`);
-              img.setAttribute("x", -radioCirculo); img.setAttribute("y", -radioCirculo); img.setAttribute("width", radioCirculo * 2); img.setAttribute("height", radioCirculo * 2);
-              img.setAttribute("preserveAspectRatio", "xMidYMid slice"); img.setAttribute("clip-path", "url(#circle-clip)"); img.style.pointerEvents = "none"; g.appendChild(img);
-            }
-            let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            tNombre.setAttribute("x", 0); tNombre.setAttribute("y", radioCirculo + 15); tNombre.setAttribute("text-anchor", "middle"); tNombre.setAttribute("class", "node-text");
-            tNombre.setAttribute("font-size", "11px"); tNombre.textContent = nombreLimpio; g.appendChild(tNombre);
+          if(eq && eq !== "Eliminado") {
+            let nl = eq.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim(); let fc = FLAG_MAP[nl];
+            if(fc) { let img = document.createElementNS("http://www.w3.org/2000/svg", "image"); img.setAttribute("href", `https://flagcdn.com/w40/${fc}.png`); img.setAttribute("x", -rad); img.setAttribute("y", -rad); img.setAttribute("width", rad*2); img.setAttribute("height", rad*2); img.setAttribute("preserveAspectRatio", "xMidYMid slice"); img.setAttribute("clip-path", "url(#cp)"); img.style.pointerEvents = "none"; g.appendChild(img); }
+            let t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("x", 0); t.setAttribute("y", rad+12); t.setAttribute("text-anchor", "middle"); t.setAttribute("class", "node-text"); t.textContent = nl; g.appendChild(t);
           }
         }
       });
-
-      // CAMPEÓN
-      let camp = DATA.bracket['Campeon_0'];
-      let campX = isMobile ? 375 : CX; let campY = isMobile ? coords['R4_0'].y : CY;
-      champGroup.setAttribute("transform", `translate(${campX}, ${campY})`); champGroup.innerHTML = '';
-
-      if (camp) {
-         let nombreLimpio = camp.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.-]/g, '').trim(); let flagCode = FLAG_MAP[nombreLimpio];
-         let d = DATA.jugadores.find(j => j.equipos.includes(camp)); let dueno = d ? d.apodo : "S/A";
-         champGroup.setAttribute("class", "node-group glowing-champion");
-         let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-         circle.setAttribute("cx", 0); circle.setAttribute("cy", -15); circle.setAttribute("r", 40); circle.setAttribute("fill", "#0f172a"); circle.setAttribute("stroke", "var(--accent)"); circle.setAttribute("stroke-width", "3.5"); champGroup.appendChild(circle);
-         if(flagCode) {
-           let img = document.createElementNS("http://www.w3.org/2000/svg", "image"); img.setAttribute("href", `https://flagcdn.com/w80/${flagCode}.png`);
-           img.setAttribute("x", -34); img.setAttribute("y", -49); img.setAttribute("width", 68); img.setAttribute("height", 68); img.setAttribute("preserveAspectRatio", "xMidYMid slice"); img.setAttribute("clip-path", "url(#circle-clip)"); champGroup.appendChild(img);
-         }
-         let tNombre = document.createElementNS("http://www.w3.org/2000/svg", "text"); tNombre.setAttribute("x", 0); tNombre.setAttribute("y", 45); tNombre.setAttribute("text-anchor", "middle"); tNombre.setAttribute("font-size", "16"); tNombre.setAttribute("font-weight", "bold"); tNombre.setAttribute("fill", "white"); tNombre.textContent = nombreLimpio; champGroup.appendChild(tNombre);
-         let tDueno = document.createElementNS("http://www.w3.org/2000/svg", "text"); tDueno.setAttribute("x", 0); tDueno.setAttribute("y", 65); tDueno.setAttribute("text-anchor", "middle"); tDueno.setAttribute("font-size", "14"); tDueno.setAttribute("fill", "var(--accent)"); tDueno.setAttribute("font-weight", "bold"); tDueno.textContent = "🥇 Ganador: " + dueno; champGroup.appendChild(tDueno);
-      } else {
-         champGroup.setAttribute("class", "node-group");
-         let tTrofeo = document.createElementNS("http://www.w3.org/2000/svg", "text"); tTrofeo.setAttribute("x", 0); tTrofeo.setAttribute("y", -5); tTrofeo.setAttribute("text-anchor", "middle"); tTrofeo.setAttribute("font-size", "45"); tTrofeo.textContent = "🏆"; champGroup.appendChild(tTrofeo);
-         let tEspera = document.createElementNS("http://www.w3.org/2000/svg", "text"); tEspera.setAttribute("x", 0); tEspera.setAttribute("y", 30); tEspera.setAttribute("text-anchor", "middle"); tEspera.setAttribute("font-size", "14"); tEspera.setAttribute("fill", "rgba(255,255,255,0.4)"); tEspera.setAttribute("font-weight", "bold"); tEspera.textContent = "Esperando Campeón"; champGroup.appendChild(tEspera);
-      }
     }
   </script>
 </body>
