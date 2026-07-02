@@ -218,20 +218,39 @@
 
     function renderizarPartidos() {
       let html = ''; if(!DATA || !DATA.partidos) return;
+      
       DATA.partidos.forEach(p => {
         if(p.g1 !== "") return; 
         let d = new Date(p.f); let hora = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); let fecha = d.toLocaleDateString();
         let st = p.stats || { gana1: 0, empate: 0, gana2: 0 };
+        
+        // REVISAR SI EL USUARIO ACTIVO YA APOSTÓ EN ESTE PARTIDO
+        let miApuesta = null;
+        if (CODIGO_ACTIVO) {
+           miApuesta = DATA.predicciones.find(x => x.cod === CODIGO_ACTIVO && x.pid === p.id);
+        }
+
+        let botonesHTML = '';
+        if (miApuesta) {
+            // Si ya apostó, quitamos los botones y mostramos confirmación
+            let vStr = miApuesta.val === '1' ? 'Gana Local' : (miApuesta.val === '2' ? 'Gana Visita' : 'Empate');
+            botonesHTML = `<div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 6px; padding: 10px; text-align: center; font-size: 13px; color: #10b981;">✅ Ya pronosticaste: <b>${vStr}</b></div>`;
+        } else {
+            // Si no ha apostado, mostramos los botones normales
+            botonesHTML = `
+            <div class="wdl-group">
+              <div class="wdl-btn" onclick="apostar('${p.id}', '1')">Gana Local <span class="wdl-stats">${st.gana1}%</span></div>
+              <div class="wdl-btn" onclick="apostar('${p.id}', 'X')">Empate <span class="wdl-stats">${st.empate}%</span></div>
+              <div class="wdl-btn" onclick="apostar('${p.id}', '2')">Gana Visita <span class="wdl-stats">${st.gana2}%</span></div>
+            </div>`;
+        }
+
         html += `
         <div class="match-card">
           <div class="match-date">📅 ${fecha} - ⏰ ${hora} (GDL)</div>
           <div class="match-title"><span>${p.eq1}</span> <span>vs</span> <span>${p.eq2}</span></div>
           <div style="font-size:12px; margin:15px 0 8px 0; color:#cbd5e1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">Bolsa Pública Actual: <b style="color:#10b981;">$${p.bW || 0} MXN</b></div>
-          <div class="wdl-group">
-            <div class="wdl-btn" onclick="apostar('${p.id}', '1')">Gana Local <span class="wdl-stats">${st.gana1}%</span></div>
-            <div class="wdl-btn" onclick="apostar('${p.id}', 'X')">Empate <span class="wdl-stats">${st.empate}%</span></div>
-            <div class="wdl-btn" onclick="apostar('${p.id}', '2')">Gana Visita <span class="wdl-stats">${st.gana2}%</span></div>
-          </div>
+          ${botonesHTML}
         </div>`;
       });
       document.getElementById('matchesList').innerHTML = html;
