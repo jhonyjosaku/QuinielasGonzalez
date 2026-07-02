@@ -29,37 +29,47 @@
     .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; margin-bottom: 15px; font-size: 13px; border-radius: 0 8px 8px 0; }
     .svg-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; padding-top: 10px;}
     svg { width: 100%; height: auto; max-height: 85vh; display: block; margin: 0 auto; transition: all 0.5s ease-in-out; }
+    
     .node-link { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 2.5; transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     .node-link.active { stroke: #00f2fe; stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 25 8; animation: fluidFlow 0.4s linear infinite; filter: drop-shadow(0px 0px 6px #00f2fe); }
     @keyframes fluidFlow { from { stroke-dashoffset: 33; } to { stroke-dashoffset: 0; } }
+    
     .node-group { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     .node-circle { fill: #111827; stroke: rgba(255,255,255,0.2); stroke-width: 2; transition: transform 0.2s, stroke 0.3s; }
     .node-circle.active { stroke: #00f2fe; fill: #030712; stroke-width: 3; }
+    
     .eliminated-node { opacity: 0.35; filter: grayscale(100%); transition: all 0.5s ease; }
     .frontier-spark { stroke: #ffffff !important; fill: #111827 !important; animation: sparkImpact 1.2s infinite alternate ease-in-out; }
     @keyframes sparkImpact { 0% { filter: drop-shadow(0 0 4px #00f2fe); transform: scale(1.1); } 100% { filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 8px #ffffff); transform: scale(1.3); } }
+
     .glowing-champion { animation: lightningGlow 2.5s infinite ease-in-out; }
     @keyframes lightningGlow { 0% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); transform: scale(1); } 50% { filter: drop-shadow(0 0 35px #00f2fe) drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); transform: scale(1.05); } 100% { filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5)); transform: scale(1); } }
+    
     .admin-mode .node-group { cursor: pointer; }
     .admin-mode .node-group:not(.eliminated-node):hover .node-circle { transform: scale(1.2); stroke: white; }
     .node-text { font-size: 10px; font-weight: 700; pointer-events: none; font-family: sans-serif; fill: white;}
+
+    /* PESTAÑA 2: APUESTAS */
     .grid-matches { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
     .match-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; }
     .match-title { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: 5px;}
     .match-date { font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 15px; }
+    
     .wdl-group { display: flex; gap: 5px; margin-bottom: 5px; }
     .wdl-btn { flex: 1; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; font-size: 13px; text-align: center; cursor: pointer; transition: 0.2s;}
     .wdl-btn:hover { background: rgba(0,242,254,0.15); border-color: #00f2fe; }
     .wdl-stats { font-size: 10px; color: #00f2fe; margin-top: 4px; display: block;}
+    
+    /* PESTAÑA 3: PERFIL */
     .profile-stat { background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;}
     .profile-stat h2 { margin: 0; font-size: 28px; color: #00f2fe; }
     .profile-stat small { color: #94a3b8; font-size: 12px; }
+    
     .empty-state { text-align: center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.2); margin-top: 10px;}
   </style>
 </head>
 <body>
 
-  <!-- CABECERA -->
   <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; position:relative;">
     <div style="flex:1;"></div>
     <h1 style="margin:0; flex:2; text-align:center; font-size: 26px; text-shadow: 0 4px 15px rgba(0,0,0,0.6);">
@@ -72,14 +82,12 @@
 
   <div class="loader" id="loader">Cargando base de datos global...</div>
 
-  <!-- PESTAÑA 1 -->
   <div id="tab-bracket" class="tab-content active">
     <div class="glass-panel" style="padding:0; overflow:hidden;">
       <div class="svg-wrapper" id="svgContainer"><svg id="bracketSvg" viewBox="0 0 1000 1000"></svg></div>
     </div>
   </div>
 
-  <!-- PESTAÑA 2 -->
   <div id="tab-matches" class="tab-content">
     <div class="glass-panel">
       <h3 style="margin-top:0; color:#00f2fe; text-align:center;">⚽ Pronósticos ($30 MXN)</h3>
@@ -88,7 +96,6 @@
     </div>
   </div>
 
-  <!-- PESTAÑA 3 -->
   <div id="tab-profile" class="tab-content">
     <div class="glass-panel" id="profileLogin">
       <h3 style="text-align:center;">👤 Mi Perfil</h3>
@@ -230,7 +237,6 @@
       document.getElementById('matchesList').innerHTML = html;
     }
 
-    // EL FIX PRINCIPAL ESTÁ AQUÍ Y EN cargarPerfilClick
     async function apostar(pId, valWDL) {
       if(!CODIGO_ACTIVO) {
         let cod = prompt("Para hacer una apuesta de $30 MXN, ingresa tu código de 6 dígitos:");
@@ -281,6 +287,8 @@
     function dibujarBracket() {
       const svg = document.getElementById('bracketSvg'); const isMobile = window.innerWidth <= 850;
       svg.setAttribute("viewBox", isMobile ? "0 0 800 1200" : "0 0 1000 1000"); 
+      svg.innerHTML = ""; // LIMPIAR EL SVG ANTES DE REDIBUJAR
+      
       if (!document.getElementById('pathLayer')) svg.innerHTML = `<defs><clipPath id="circle-clip" clipPathUnits="objectBoundingBox"><circle cx="0.5" cy="0.5" r="0.5"></circle></clipPath></defs><g id="pathLayer"></g><g id="nodeLayer"></g><g id="championGroup"></g>`;
       
       let pathLayer = document.getElementById('pathLayer'); let nodeLayer = document.getElementById('nodeLayer'); let champGroup = document.getElementById('championGroup');
@@ -307,8 +315,16 @@
           
           let pathId = `link_${rAct}_${i}`; let path = document.getElementById(pathId); 
           if (!path) { path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.id = pathId; path.setAttribute("class", "node-link"); pathLayer.appendChild(path); }
+          
           let eqOrigen = DATA.bracket[rAct+'_'+i], eqDestino = DATA.bracket[rSig+'_'+Math.floor(i/2)];
-          if(eqOrigen && eqOrigen !== "Eliminado" && eqOrigen === eqDestino) path.classList.add('active'); else path.classList.remove('active');
+          
+          // LÓGICA DE ACTIVACIÓN CORREGIDA
+          if(eqOrigen && eqOrigen !== "Eliminado" && eqOrigen === eqDestino) {
+              path.classList.add('active'); 
+          } else { 
+              path.classList.remove('active'); 
+          }
+          
           path.setAttribute("d", `M ${p1.x} ${p1.y} L ${pM.x} ${pM.y} L ${p2.x} ${p2.y}`);
         }
       }
